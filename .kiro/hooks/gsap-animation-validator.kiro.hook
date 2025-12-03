@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "GSAP Animation Validator",
+  "description": "Validates GSAP animation files on save to check for: lowercase ease names (power2.out not Power2.easeOut), TextPlugin registration before text animations, only GPU-accelerated properties (x, y, scale, opacity, filter), timeline cleanup methods, and duration matching design.md specs.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/js/animations/*.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze this GSAP animation file and check for the following issues:\n\n1. **Ease Name Format**: Look for any uppercase ease names like 'Power2.easeOut', 'Expo.easeIn', 'Linear.easeNone'. They MUST be lowercase GSAP 3 format: 'power2.out', 'expo.in', 'none'.\n\n2. **TextPlugin Registration**: If the file uses `text:` property in any gsap.to/from/fromTo call, verify that `gsap.registerPlugin(TextPlugin)` is called BEFORE any text animations.\n\n3. **GPU-Accelerated Properties Only**: Flag any animations using non-GPU properties. ALLOWED: x, y, scale, scaleX, scaleY, rotation, opacity, filter. FORBIDDEN: width, height, top, left, right, bottom, margin, padding, fontSize.\n\n4. **Timeline Cleanup**: Check that timelines are stored in variables and that there's a cleanup/kill method (gsap.killTweensOf or timeline.kill()) for component unmount.\n\n5. **Duration Specs**: Cross-reference durations with these design specs:\n   - Page transitions: 0.3-0.4s\n   - Boot sequence: 3s max total\n   - Time travel: 2.5s total\n   - Button hover: 0.15s\n   - Menu stagger: 0.05s/item\n   - Cursor blink: 0.53s\n\nReport any violations found with specific line references and provide the correct fix for each issue."
+  }
+}

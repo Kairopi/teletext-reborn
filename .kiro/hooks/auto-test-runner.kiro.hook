@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Auto-Test Runner",
+  "description": "Automatically runs npm test after the agent finishes any implementation task to provide immediate feedback and catch regressions instantly",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "npm test"
+  }
+}

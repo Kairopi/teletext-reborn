@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Copy Quality Guard",
+  "description": "Validates user-facing text in JavaScript files on save: ensures all text ≤40 characters per line, headers are UPPERCASE, authentic Teletext tone (no modern slang), and proper truncation with ellipsis.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze this JavaScript file for user-facing text quality. Check all string literals that appear to be user-facing copy (error messages, labels, titles, descriptions, etc.) and validate:\n\n1. **Line Length**: All text must be ≤40 characters per line. Flag any strings exceeding this limit.\n\n2. **Headers UPPERCASE**: Section headers and titles should be in UPPERCASE. Look for strings used as headers/titles and verify they're uppercase.\n\n3. **Authentic Teletext Tone**: Flag any modern slang, emojis, or contemporary phrases. Text should feel like 1980s-90s British Teletext - formal, concise, informative. Examples of violations: \"awesome\", \"cool\", \"check out\", \"hey\", \"gonna\", \"wanna\", emoji characters.\n\n4. **Proper Truncation**: Long text that needs truncation should use ellipsis (…) not \"...\" and should truncate at word boundaries when possible.\n\nReport each issue found with:\n- The exact string containing the issue\n- Line number if possible\n- Which rule it violates\n- Suggested fix\n\nIf no issues found, confirm the copy meets Teletext quality standards."
+  }
+}

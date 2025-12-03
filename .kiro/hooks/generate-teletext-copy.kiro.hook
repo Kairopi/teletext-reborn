@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Generate Teletext Copy",
+  "description": "Click to review the current page and get suggestions for authentic Teletext-style headlines, 40-character formatted text, period-appropriate language, and engaging micro-copy.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review the current file and suggest professional Teletext-style copywriting improvements:\n\n1. **Headlines**: Create authentic Teletext-style headlines (uppercase, punchy, max 40 chars)\n2. **Body Text**: Format all text to 40-character line width maximum\n3. **Period-Appropriate Language**: Use 1980s-90s British Teletext/Ceefax terminology and tone\n4. **Micro-Copy**: Suggest engaging button labels, navigation text, and status messages\n\nGuidelines:\n- Use uppercase for headlines and section headers\n- Keep language concise and direct (Teletext had limited space)\n- Use period-appropriate terms: \"PRESS\", \"SELECT\", \"VIEW\", \"HOLD\"\n- Include page number references where appropriate (e.g., \"SEE P.101\")\n- Suggest Fastext button labels (Red/Green/Yellow/Cyan)\n- Ensure all copy fits within the 40-column constraint\n- Match the nostalgic, informative tone of original Ceefax/Oracle services\n\nProvide specific text suggestions with character counts to ensure they fit the 40-character limit."
+  }
+}

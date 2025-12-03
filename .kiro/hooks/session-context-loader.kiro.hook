@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Session Context Loader",
+  "description": "Reminds the agent to read specification files in the correct order at the start of each session to ensure full project context before any implementation work.",
+  "version": "1",
+  "when": {
+    "type": "sessionStart"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Before ANY implementation, read these files in order:\n1. .kiro/specs/teletext-reborn/tasks.md\n2. .kiro/specs/teletext-reborn/requirements.md\n3. .kiro/specs/teletext-reborn/design.md\nThen follow .kiro/steering/agent.md rules."
+  }
+}

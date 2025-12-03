@@ -1,0 +1,17 @@
+{
+  "enabled": true,
+  "name": "Teletext Design Enforcer",
+  "description": "Scans CSS and JS files on save for Teletext design violations: colors outside the 8-color palette (#000000, #FF0000, #00FF00, #FFFF00, #0000FF, #FF00FF, #00FFFF, #FFFFFF), font-family not \"Press Start 2P\", text strings exceeding 40 characters, and layout breaking 4:3 aspect ratio.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.css",
+      "**/*.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Scan this file for Teletext design violations and report any issues found:\n\n1. **Color Violations**: Flag any color values that are NOT one of these 8 Teletext colors:\n   - #000000 (Black)\n   - #FF0000 (Red)\n   - #00FF00 (Green)\n   - #FFFF00 (Yellow)\n   - #0000FF (Blue)\n   - #FF00FF (Magenta)\n   - #00FFFF (Cyan)\n   - #FFFFFF (White)\n   Also check for rgb/rgba/hsl equivalents that don't match these colors.\n\n2. **Font Violations**: Flag any font-family declarations that don't use \"Press Start 2P\" as the primary font.\n\n3. **Text Length Violations**: Flag any hardcoded text strings longer than 40 characters (the Teletext line width limit).\n\n4. **Aspect Ratio Violations**: Flag any width/height combinations or aspect-ratio properties that break the 4:3 ratio (max-width should be 800px).\n\nFor each violation found, report:\n- Line number\n- The violation type\n- The problematic code\n- The suggested fix\n\nIf no violations are found, confirm the file is 100% Teletext design compliant."
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "API Service Validator",
+  "description": "Validates API service files when saved to ensure they follow project patterns: fetchWithRetry usage, try/catch error handling, cache implementation with correct TTL, and rate limit tracking for NewsData.io and CoinGecko APIs.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/js/services/*.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review this API service file and verify it follows the required patterns from api-patterns.md:\n\n1. **fetchWithRetry Pattern**: Ensure all API calls use the fetchWithRetry wrapper with proper retry logic (default 3 retries) and AbortSignal.timeout(10000)\n\n2. **Error Handling**: Verify try/catch blocks are present around all async operations with appropriate error types (NETWORK, TIMEOUT, RATE_LIMIT, NOT_FOUND, SERVER, PARSE)\n\n3. **Cache Implementation**: Check that caching is implemented with correct TTL values:\n   - Open-Meteo (weather): 15 min\n   - Open-Meteo Archive: 24 hours\n   - Wikipedia: 24 hours\n   - NewsData.io: 5 min\n   - CoinGecko: 1 min\n   - IP-API: Session\n\n4. **Rate Limit Tracking**: For NewsData.io (200/day) and CoinGecko (50/min), verify rate limit tracking is implemented using localStorage with canMakeRequest() and trackRequest() pattern\n\nReport any missing patterns or violations, and suggest specific fixes to ensure robust, reliable API integration."
+  }
+}

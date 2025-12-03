@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "JavaScript Quality Guard",
+  "description": "Runs diagnostics on saved .js files to catch syntax errors, console.log statements, hardcoded colors outside the 8 Teletext colors (#000000, #FF0000, #00FF00, #FFFF00, #0000FF, #FF00FF, #00FFFF, #FFFFFF), and missing error handling in async functions.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "**/*.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze the saved JavaScript file for quality issues:\n\n1. **Syntax Errors**: Check for any JavaScript syntax errors or issues that would prevent the code from running.\n\n2. **Console.log Statements**: Find any `console.log`, `console.warn`, `console.error`, or `console.debug` statements that should be removed before production.\n\n3. **Hardcoded Colors**: Check for any color values (hex codes like #RRGGBB, rgb(), rgba(), hsl(), or color names) that are NOT one of the 8 allowed Teletext colors:\n   - #000000 (Black)\n   - #FF0000 (Red)\n   - #00FF00 (Green)\n   - #FFFF00 (Yellow)\n   - #0000FF (Blue)\n   - #FF00FF (Magenta)\n   - #00FFFF (Cyan)\n   - #FFFFFF (White)\n\n4. **Missing Error Handling in Async Functions**: Check for async functions or .then() chains that lack proper try/catch blocks or .catch() handlers.\n\nReport each issue found with:\n- The line number\n- The problematic code snippet\n- A brief explanation of why it's an issue\n- A suggested fix\n\nIf no issues are found, confirm the file passes all quality checks."
+  }
+}

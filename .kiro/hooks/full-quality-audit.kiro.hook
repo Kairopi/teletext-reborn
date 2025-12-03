@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Full Quality Audit",
+  "description": "Comprehensive quality scan triggered manually via button. Audits all design constraints (8 Teletext colors, 40-char line limit, 4:3 aspect ratio), accessibility requirements (WCAG 2.1 AA, keyboard navigation, ARIA labels, contrast ratios), animation specs (GSAP timings, easing functions, 60fps performance), API patterns (error handling, caching, rate limits), test coverage, and performance metrics. Acts as a pre-commit quality gate to catch all issues.",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Perform a comprehensive quality audit of the Teletext Reborn codebase. Check ALL of the following:\n\n**1. Design Constraints:**\n- Only 8 Teletext colors used (#000000, #FF0000, #00FF00, #FFFF00, #0000FF, #FF00FF, #00FFFF, #FFFFFF)\n- No text exceeds 40 characters per line\n- \"Press Start 2P\" font used exclusively\n- 4:3 aspect ratio maintained, max 800px width\n- 40×22 grid layout respected\n\n**2. Accessibility Requirements:**\n- WCAG 2.1 AA compliance (4.5:1 contrast minimum)\n- All interactive elements keyboard accessible (Tab, Enter, Space, Escape, Arrow keys)\n- ARIA labels on all interactive elements\n- Live regions for dynamic content\n- Focus indicators always visible\n- prefers-reduced-motion support\n\n**3. Animation Specs:**\n- GSAP 3 lowercase ease syntax (power2.out, not Power2.easeOut)\n- TextPlugin registered before use\n- Only GPU-accelerated properties animated (x, y, scale, opacity, filter)\n- Correct durations: page transitions 0.3-0.4s, boot 3s max, time travel 2.5s, button hover 0.15s\n- Timeline cleanup on unmount (gsap.killTweensOf)\n- 60fps performance\n\n**4. API Patterns:**\n- All API calls have error handling and retry logic\n- Caching implemented with correct TTLs\n- Rate limit tracking for NewsData.io and CoinGecko\n- Offline support with stale data fallback\n- 10s timeout on all requests\n\n**5. Test Coverage:**\n- Unit tests for all utility functions\n- Integration tests for API services\n- Component tests for pages\n\n**6. Performance Metrics:**\n- Interactive in <3 seconds\n- No layout thrashing (no animating width/height/top/left)\n- localStorage operations wrapped in try/catch\n\nReport all violations found with file locations and specific issues. Prioritize by severity (Critical, Warning, Info)."
+  }
+}

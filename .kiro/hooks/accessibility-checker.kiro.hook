@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "Accessibility Checker",
+  "description": "Checks page components for WCAG 2.1 AA compliance on save, including ARIA labels on interactive elements, keyboard navigation handlers, focus indicators, and screen reader friendly structure.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/js/pages/*.js"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A page component file was just saved. Please review it for WCAG 2.1 AA accessibility compliance. Check for:\n\n1. **ARIA Labels**: Verify all interactive elements (buttons, links, inputs, custom controls) have appropriate aria-label, aria-labelledby, or aria-describedby attributes.\n\n2. **Keyboard Navigation**: Ensure keyboard handlers exist for:\n   - Tab navigation through interactive elements\n   - Enter/Space to activate buttons and links\n   - Escape key handling where appropriate\n   - Arrow key navigation for menus/lists\n   - Number keys for quick page navigation (Teletext pattern)\n\n3. **Focus Indicators**: Check that:\n   - All focusable elements have visible focus styles (2px dotted cyan outline per project spec)\n   - Focus is not suppressed with outline:none without alternative\n   - tabindex is used appropriately (0 for natural order, -1 for programmatic focus)\n\n4. **Screen Reader Structure**: Verify:\n   - Proper heading hierarchy (h1, h2, h3)\n   - ARIA landmarks (role=\"main\", role=\"navigation\", role=\"banner\")\n   - Live regions (aria-live) for dynamic content updates\n   - Meaningful alt text for any ASCII art or decorative elements\n   - Hidden decorative elements with aria-hidden=\"true\"\n\n5. **Color & Contrast**: Confirm information is not conveyed by color alone and text meets 4.5:1 contrast ratio.\n\n6. **Reduced Motion**: Check for prefers-reduced-motion media query support.\n\nReport any accessibility issues found with specific line references and provide code suggestions to fix them."
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Easter Egg Validator",
+  "description": "Manual button to verify all easter eggs work: Page 888 (fun facts), Page 404 (humorous message), Konami code, Birthday detection, and Y2K countdown",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Please verify all easter egg features are working correctly in the Teletext Reborn application:\n\n1. **Page 888 (Fun Facts)**: Navigate to page 888 and verify it displays Teletext fun facts with proper styling\n2. **Page 404 (Humorous Message)**: Navigate to a non-existent page and verify a humorous \"not found\" message appears\n3. **Konami Code (Color Burst)**: Check that the Konami code (↑↑↓↓←→←→BA) triggers Color Burst mode\n4. **Birthday Detection**: Verify the birthday detection feature shows confetti animation when user's birthday matches\n5. **Y2K Countdown**: Check that Dec 31, 1999 in Time Machine shows a Y2K countdown\n\nFor each easter egg, verify:\n- It triggers correctly under the right conditions\n- Visual effects/animations work smoothly (60fps)\n- Styling matches Teletext aesthetic (8 colors only)\n- It creates genuine delight for users\n\nReport any issues found and suggest fixes if needed."
+  }
+}
