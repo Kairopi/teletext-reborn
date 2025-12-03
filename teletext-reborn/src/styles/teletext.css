@@ -1,0 +1,342 @@
+/* Google Fonts Import - MUST be first */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/**
+ * Teletext Reborn - Core Design System
+ * 
+ * This file defines the authentic Teletext color palette and typography system.
+ * All colors are strictly limited to the 8 original Teletext colors.
+ * 
+ * Requirements: 2.1, 2.2, 28.1-28.10, 29.1-29.10
+ */
+
+/* ============================================
+   COLOR PALETTE - STRICT 8 TELETEXT COLORS
+   ============================================ */
+
+:root {
+  /* Primary Teletext Colors (Req 2.1) */
+  --tt-black: #000000;
+  --tt-red: #FF0000;
+  --tt-green: #00FF00;
+  --tt-yellow: #FFFF00;
+  --tt-blue: #0000FF;
+  --tt-magenta: #FF00FF;
+  --tt-cyan: #00FFFF;
+  --tt-white: #FFFFFF;
+
+  /* Semantic Color Mappings (Req 28.1-28.10) */
+  --color-primary: var(--tt-yellow);           /* Primary content text (28.1) */
+  --color-secondary: var(--tt-white);          /* Secondary/descriptive text (28.2) */
+  --color-interactive: var(--tt-cyan);         /* Interactive elements, links (28.3) */
+  --color-positive: var(--tt-green);           /* Positive values, success (28.4) */
+  --color-negative: var(--tt-red);             /* Negative values, errors (28.5) */
+  --color-special: var(--tt-magenta);          /* Special highlights, Time Machine (28.6) */
+  --color-header-bg: var(--tt-blue);           /* Headers, navigation backgrounds (28.7) */
+  --color-bg: var(--tt-black);                 /* All backgrounds (28.8) */
+
+  /* Opacity Variants (Req 28.2, 28.9, 28.10) */
+  --color-secondary-90: rgba(255, 255, 255, 0.9);   /* Secondary text (28.2) */
+  --color-secondary-70: rgba(255, 255, 255, 0.7);   /* Timestamps, metadata (28.9) */
+  --color-secondary-40: rgba(255, 255, 255, 0.4);   /* Disabled options (28.10) */
+}
+
+/* ============================================
+   TYPOGRAPHY SYSTEM
+   ============================================ */
+
+:root {
+  /* Font Family - Press Start 2P ONLY (Req 2.2) */
+  --font-primary: 'Press Start 2P', monospace;
+
+  /* Font Sizes (Req 29.1-29.4) */
+  --font-size-base: 14px;      /* Body text (29.3) */
+  --font-size-small: 12px;     /* Captions, metadata (29.4) */
+  --font-size-caption: 11px;   /* Small captions */
+
+  /* Line Heights */
+  --line-height-base: 1.5;
+  --line-height-tight: 1.2;
+
+  /* Character Grid Constraints (Req 2.10) */
+  --grid-columns: 40;
+  --grid-rows: 22;
+  --char-width: 1ch;
+}
+
+/* Base Typography */
+body {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-primary);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: unset;
+}
+
+/* ============================================
+   TEXT HIERARCHY (Req 29.1-29.10)
+   ============================================ */
+
+/* Page Titles - Double-height, yellow, centered (Req 29.1) */
+.title,
+.double-height {
+  transform: scaleY(2);
+  transform-origin: top;
+  line-height: 1;
+  color: var(--tt-yellow);
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+/* Section Headers - 1.5x height, cyan, uppercase (Req 29.2) */
+.section-header {
+  transform: scaleY(1.5);
+  transform-origin: top;
+  text-transform: uppercase;
+  color: var(--tt-cyan);
+  line-height: 1;
+  margin-bottom: 0.5em;
+}
+
+/* Section header underline */
+.section-header::after {
+  content: '';
+  display: block;
+  margin-top: 0.3em;
+  border-bottom: 2px solid var(--tt-cyan);
+  transform: scaleY(0.67); /* Compensate for parent scale */
+}
+
+/* Alternative underline using characters */
+.section-header-underline {
+  color: var(--tt-cyan);
+  margin-top: 0.2em;
+}
+
+/* Body Text - Standard height, yellow or white (Req 29.3) */
+.body-text {
+  font-size: var(--font-size-base);
+  color: var(--color-primary);
+  line-height: var(--line-height-base);
+}
+
+.body-text-secondary {
+  font-size: var(--font-size-base);
+  color: var(--color-secondary-90);
+  line-height: var(--line-height-base);
+}
+
+/* Captions and Metadata - 0.85x size, white at 70% (Req 29.4) */
+.caption,
+.metadata {
+  font-size: calc(var(--font-size-base) * 0.85);
+  color: var(--color-secondary-70);
+  line-height: var(--line-height-tight);
+}
+
+/* Navigation Labels - Fastext button colors (Req 29.5) */
+.nav-label-red { color: var(--tt-red); }
+.nav-label-green { color: var(--tt-green); }
+.nav-label-yellow { color: var(--tt-yellow); }
+.nav-label-cyan { color: var(--tt-cyan); }
+
+/* Data Values - Color coded (Req 29.7) */
+.value-positive { color: var(--color-positive); }
+.value-negative { color: var(--color-negative); }
+.value-neutral { color: var(--color-secondary); }
+
+/* Timestamps - "HH:MM" or "X mins ago" (Req 29.8) */
+.timestamp {
+  color: var(--color-secondary-70);
+  font-size: calc(var(--font-size-base) * 0.85);
+}
+
+/* Page Numbers in Content - Cyan, navigable (Req 29.9) */
+.page-number-link {
+  color: var(--color-interactive);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.page-number-link:hover {
+  text-decoration: underline;
+}
+
+/* Error Messages - Red with ⚠ prefix (Req 29.10) */
+.error-text {
+  color: var(--color-negative);
+}
+
+.error-text::before {
+  content: '⚠ ';
+}
+
+/* ============================================
+   EMPHASIS STYLES (Req 29.6)
+   ============================================ */
+
+/* Flashing emphasis text - 500ms toggle */
+.emphasis-flash {
+  animation: emphasis-blink 0.5s steps(1) infinite;
+}
+
+@keyframes emphasis-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Inverse color emphasis - black on color background */
+.emphasis-inverse {
+  padding: 2px 4px;
+  color: var(--tt-black);
+}
+
+.emphasis-inverse.red { background: var(--tt-red); }
+.emphasis-inverse.green { background: var(--tt-green); }
+.emphasis-inverse.yellow { background: var(--tt-yellow); }
+.emphasis-inverse.cyan { background: var(--tt-cyan); }
+.emphasis-inverse.white { background: var(--tt-white); }
+.emphasis-inverse.magenta { background: var(--tt-magenta); }
+
+/* ============================================
+   DISABLED STATES (Req 28.10)
+   ============================================ */
+
+.disabled,
+[disabled] {
+  color: var(--color-secondary-40);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ============================================
+   DECORATIVE ELEMENTS (Req 32.3, 32.5, 32.6)
+   ============================================ */
+
+/* Horizontal separators using block characters (Req 32.5) */
+.separator {
+  color: var(--tt-cyan);
+  margin: 0.5em 0;
+  user-select: none;
+}
+
+.separator-heavy::before {
+  content: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+}
+
+.separator-double::before {
+  content: '════════════════════════════════════════';
+}
+
+.separator-light::before {
+  content: '────────────────────────────────────────';
+}
+
+/* Bullet points - ► or • in cyan (Req 32.6) */
+.bullet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bullet-list li {
+  padding-left: 1.5em;
+  position: relative;
+}
+
+.bullet-list li::before {
+  content: '►';
+  position: absolute;
+  left: 0;
+  color: var(--tt-cyan);
+}
+
+.bullet-list.dot li::before {
+  content: '•';
+}
+
+/* ============================================
+   SPECIAL TEXT STYLES
+   ============================================ */
+
+/* Time Machine active indicator (Req 30.10) */
+.time-machine-indicator {
+  color: var(--color-special);
+  font-size: var(--font-size-small);
+}
+
+/* Offline badge (Req 30.4) */
+.offline-badge {
+  color: var(--tt-yellow);
+  font-size: var(--font-size-small);
+}
+
+.offline-badge::before {
+  content: '⚡ ';
+}
+
+/* Stale data indicator (Req 30.5) */
+.stale-indicator {
+  opacity: 0.8;
+  color: var(--tt-yellow);
+  font-size: var(--font-size-small);
+}
+
+/* Success text */
+.success-text {
+  color: var(--color-positive);
+}
+
+/* ============================================
+   SELECTION STYLES
+   ============================================ */
+
+/* Yellow on black selection */
+::selection {
+  background: var(--tt-yellow);
+  color: var(--tt-black);
+}
+
+::-moz-selection {
+  background: var(--tt-yellow);
+  color: var(--tt-black);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Text colors */
+.text-black { color: var(--tt-black); }
+.text-red { color: var(--tt-red); }
+.text-green { color: var(--tt-green); }
+.text-yellow { color: var(--tt-yellow); }
+.text-blue { color: var(--tt-blue); }
+.text-magenta { color: var(--tt-magenta); }
+.text-cyan { color: var(--tt-cyan); }
+.text-white { color: var(--tt-white); }
+
+/* Background colors */
+.bg-black { background-color: var(--tt-black); }
+.bg-red { background-color: var(--tt-red); }
+.bg-green { background-color: var(--tt-green); }
+.bg-yellow { background-color: var(--tt-yellow); }
+.bg-blue { background-color: var(--tt-blue); }
+.bg-magenta { background-color: var(--tt-magenta); }
+.bg-cyan { background-color: var(--tt-cyan); }
+.bg-white { background-color: var(--tt-white); }
+
+/* Text alignment */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+/* Line width constraint - 40 characters max (Req 2.10) */
+.line-constrained {
+  max-width: 40ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

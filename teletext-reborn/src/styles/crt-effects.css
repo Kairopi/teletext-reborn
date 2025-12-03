@@ -1,0 +1,468 @@
+/**
+ * Teletext Reborn - CRT Visual Effects
+ * 
+ * Premium CRT television effects for authentic retro experience.
+ * These effects create the nostalgic feel of viewing Teletext on a CRT TV.
+ * 
+ * Requirements: 2.3, 2.4, 2.13, 24.1-24.8
+ */
+
+/* ============================================
+   TV BEZEL FRAME (Req 24.7)
+   ============================================ */
+
+.tv-bezel {
+  position: relative;
+  padding: 10px;
+  background: linear-gradient(
+    145deg,
+    #3a3a3a 0%,
+    #2a2a2a 50%,
+    #1a1a1a 100%
+  );
+  border-radius: 24px;
+  box-shadow: 
+    /* Outer shadow for depth */
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    /* Inner highlight */
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    /* Inner shadow */
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Inner shadow for recessed screen (Req 24.6) */
+.tv-bezel::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 20px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Power LED indicator */
+.tv-bezel::after {
+  content: '';
+  position: absolute;
+  bottom: 12px;
+  right: 20px;
+  width: 6px;
+  height: 6px;
+  background: var(--tt-green, #00FF00);
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--tt-green, #00FF00);
+  animation: led-pulse 2s ease-in-out infinite;
+  z-index: 20;
+}
+
+@keyframes led-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ============================================
+   SCREEN CURVATURE (Req 24.1, 2.4)
+   ============================================ */
+
+.crt-screen {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  /* Subtle barrel distortion simulation */
+  box-shadow: 
+    inset 0 0 100px rgba(0, 0, 0, 0.3),
+    inset 0 0 50px rgba(0, 0, 0, 0.2);
+}
+
+/* Screen curvature effect using border-radius (2-4px curve) */
+.screen-curve {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* ============================================
+   SCANLINES OVERLAY (Req 2.3, 24.5)
+   ============================================ */
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  /* 2px spacing, alternating brightness (Req 24.5) */
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.15) 1px,
+    rgba(0, 0, 0, 0.3) 2px
+  );
+}
+
+/* Alternative scanlines with 30% opacity (Req 2.3) */
+.scanlines-standard {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.3) 1px,
+    rgba(0, 0, 0, 0.3) 2px
+  );
+}
+
+/* Scanlines toggle class */
+.scanlines-disabled .scanlines,
+.scanlines-disabled .scanlines-standard {
+  display: none;
+}
+
+/* ============================================
+   PHOSPHOR GLOW EFFECT (Req 24.2, 2.4)
+   ============================================ */
+
+/* Text glow - 2px blur, 50% opacity in text color */
+.phosphor-glow {
+  text-shadow: 
+    0 0 2px currentColor,
+    0 0 4px rgba(255, 255, 0, 0.5);
+}
+
+/* Specific color glows */
+.glow-yellow {
+  text-shadow: 
+    0 0 2px var(--tt-yellow, #FFFF00),
+    0 0 4px rgba(255, 255, 0, 0.5);
+}
+
+.glow-cyan {
+  text-shadow: 
+    0 0 2px var(--tt-cyan, #00FFFF),
+    0 0 4px rgba(0, 255, 255, 0.5);
+}
+
+.glow-green {
+  text-shadow: 
+    0 0 2px var(--tt-green, #00FF00),
+    0 0 4px rgba(0, 255, 0, 0.5);
+}
+
+.glow-red {
+  text-shadow: 
+    0 0 2px var(--tt-red, #FF0000),
+    0 0 4px rgba(255, 0, 0, 0.5);
+}
+
+.glow-white {
+  text-shadow: 
+    0 0 2px var(--tt-white, #FFFFFF),
+    0 0 4px rgba(255, 255, 255, 0.5);
+}
+
+.glow-magenta {
+  text-shadow: 
+    0 0 2px var(--tt-magenta, #FF00FF),
+    0 0 4px rgba(255, 0, 255, 0.5);
+}
+
+/* Screen glow effect */
+.screen-glow {
+  box-shadow: 
+    0 0 20px rgba(255, 255, 0, 0.1),
+    inset 0 0 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   VIGNETTE EFFECT (Req 2.13)
+   ============================================ */
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.3) 80%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+/* Stronger vignette variant */
+.vignette-strong {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.4) 75%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+}
+
+/* ============================================
+   GLASS REFLECTION OVERLAY (Req 24.3)
+   ============================================ */
+
+.glass-reflection {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 15;
+  /* Diagonal reflection from top-left to bottom-right, 5% opacity */
+  background: 
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.03) 25%,
+      transparent 50%,
+      transparent 100%
+    );
+}
+
+/* ============================================
+   RGB CHROMATIC ABERRATION (Req 24.4)
+   ============================================ */
+
+/* 1px offset: red left, blue right */
+.rgb-separation {
+  text-shadow:
+    -1px 0 rgba(255, 0, 0, 0.5),
+    1px 0 rgba(0, 0, 255, 0.5);
+}
+
+/* Subtle chromatic aberration for general use */
+.chromatic-aberration {
+  text-shadow:
+    -0.5px 0 rgba(255, 0, 0, 0.3),
+    0.5px 0 rgba(0, 0, 255, 0.3);
+}
+
+/* Combined phosphor glow + chromatic aberration */
+.crt-text {
+  text-shadow:
+    0 0 2px currentColor,
+    0 0 4px rgba(255, 255, 0, 0.3),
+    -0.5px 0 rgba(255, 0, 0, 0.2),
+    0.5px 0 rgba(0, 0, 255, 0.2);
+}
+
+/* ============================================
+   NOISE TEXTURE OVERLAY (Req 24.8)
+   ============================================ */
+
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 12;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* Animated noise for static effect */
+.noise-animated {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 12;
+  opacity: 0;
+  background: repeating-radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 255, 255, 0.1) 0px,
+    transparent 1px,
+    transparent 2px
+  );
+  animation: noise-flicker 0.1s steps(5) infinite;
+}
+
+@keyframes noise-flicker {
+  0% { 
+    opacity: 0.03;
+    background-position: 0 0;
+  }
+  25% { 
+    opacity: 0.02;
+    background-position: 5px 5px;
+  }
+  50% { 
+    opacity: 0.04;
+    background-position: -5px 10px;
+  }
+  75% { 
+    opacity: 0.02;
+    background-position: 10px -5px;
+  }
+  100% { 
+    opacity: 0.03;
+    background-position: -10px 0;
+  }
+}
+
+/* ============================================
+   STATIC/NOISE EFFECT FOR TRANSITIONS
+   ============================================ */
+
+.static-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(0, 0, 0, 0.03) 1px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(0, 0, 0, 0.03) 1px
+    );
+  animation: static-noise 0.05s steps(10) infinite;
+}
+
+@keyframes static-noise {
+  0% { background-position: 0 0, 0 0; }
+  25% { background-position: 2px 1px, -1px 2px; }
+  50% { background-position: -1px -2px, 2px -1px; }
+  75% { background-position: 1px 2px, -2px 1px; }
+  100% { background-position: -2px -1px, 1px -2px; }
+}
+
+/* Static visible state */
+.static-overlay.visible {
+  opacity: 0.5;
+}
+
+/* ============================================
+   IDLE SCREEN FLICKER (Req 2.9)
+   ============================================ */
+
+/* Subtle brightness flicker after 30s idle */
+.idle-flicker {
+  animation: idle-brightness 4s ease-in-out infinite;
+}
+
+@keyframes idle-brightness {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.97; }
+}
+
+/* ============================================
+   CRT WARM-UP LINE (Boot Animation)
+   ============================================ */
+
+.crt-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--tt-white, #FFFFFF);
+  transform: scaleY(0);
+  transform-origin: center;
+  box-shadow: 0 0 10px var(--tt-white, #FFFFFF);
+}
+
+/* ============================================
+   FLASH OVERLAY (Time Travel Animation)
+   ============================================ */
+
+.flash-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background: var(--tt-white, #FFFFFF);
+  opacity: 0;
+}
+
+/* ============================================
+   COMBINED CRT EFFECT CONTAINER
+   ============================================ */
+
+.crt-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+/* Apply all CRT effects */
+.crt-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  /* Vignette */
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.3) 80%,
+    rgba(0, 0, 0, 0.5) 100%
+  );
+}
+
+/* ============================================
+   REDUCED MOTION SUPPORT (Req 25.10)
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .idle-flicker,
+  .noise-animated,
+  .static-overlay {
+    animation: none;
+  }
+  
+  .led-pulse {
+    animation: none;
+  }
+}
+
+/* Manual reduced motion toggle */
+.reduced-motion .idle-flicker,
+.reduced-motion .noise-animated,
+.reduced-motion .static-overlay {
+  animation: none;
+}
+
+/* ============================================
+   EFFECT TOGGLE CLASSES
+   ============================================ */
+
+/* Disable individual effects */
+.no-scanlines .scanlines,
+.no-scanlines .scanlines-standard { display: none; }
+
+.no-vignette .vignette,
+.no-vignette .vignette-strong { display: none; }
+
+.no-glow .phosphor-glow,
+.no-glow .glow-yellow,
+.no-glow .glow-cyan,
+.no-glow .glow-green,
+.no-glow .glow-red,
+.no-glow .glow-white,
+.no-glow .glow-magenta { text-shadow: none; }
+
+.no-noise .noise-overlay,
+.no-noise .noise-animated { display: none; }
+
+.no-reflection .glass-reflection { display: none; }
+
+.no-aberration .rgb-separation,
+.no-aberration .chromatic-aberration { text-shadow: none; }
