@@ -290,6 +290,226 @@ body {
 }
 
 /* ============================================
+   BLOCK CHARACTER DECORATIONS (Req 32.3, 32.5, 32.6)
+   Authentic Teletext visual elements
+   ============================================ */
+
+/* Block progress bar container */
+.block-progress {
+  font-family: var(--font-primary);
+  color: var(--tt-cyan);
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.block-progress-filled {
+  color: var(--tt-green);
+}
+
+.block-progress-empty {
+  color: var(--tt-cyan);
+  opacity: 0.5;
+}
+
+/* Animated block progress bar */
+.block-progress-animated {
+  display: inline-block;
+}
+
+.block-progress-animated .block {
+  display: inline-block;
+  transition: color 0.1s ease-out;
+}
+
+.block-progress-animated .block.filled {
+  color: var(--tt-green);
+  text-shadow: 0 0 4px var(--tt-green);
+}
+
+.block-progress-animated .block.empty {
+  color: var(--tt-cyan);
+  opacity: 0.4;
+}
+
+/* Block borders */
+.block-border {
+  border: none;
+  padding: 8px 12px;
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.block-border-single {
+  border: 2px solid var(--tt-cyan);
+}
+
+.block-border-double {
+  border: 3px double var(--tt-cyan);
+}
+
+.block-border-block {
+  box-shadow: 
+    inset 4px 0 0 var(--tt-cyan),
+    inset -4px 0 0 var(--tt-cyan),
+    inset 0 4px 0 var(--tt-cyan),
+    inset 0 -4px 0 var(--tt-cyan);
+}
+
+/* Block separators */
+.block-separator {
+  color: var(--tt-cyan);
+  user-select: none;
+  margin: 8px 0;
+  letter-spacing: -1px;
+}
+
+.block-separator-heavy::before {
+  content: '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━';
+}
+
+.block-separator-double::before {
+  content: '════════════════════════════════════════';
+}
+
+.block-separator-shade::before {
+  content: '░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░';
+}
+
+.block-separator-mixed::before {
+  content: '▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄▀▄';
+}
+
+/* Block headers */
+.block-header {
+  color: var(--tt-cyan);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.block-header-underline::after {
+  content: '';
+  display: block;
+  margin-top: 2px;
+  border-bottom: 2px solid var(--tt-cyan);
+}
+
+/* Bullet points with block characters */
+.block-bullet {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.block-bullet li {
+  padding-left: 1.5em;
+  position: relative;
+  margin-bottom: 4px;
+}
+
+.block-bullet li::before {
+  content: '►';
+  position: absolute;
+  left: 0;
+  color: var(--tt-cyan);
+}
+
+.block-bullet.dot li::before {
+  content: '•';
+}
+
+.block-bullet.arrow li::before {
+  content: '→';
+}
+
+.block-bullet.star li::before {
+  content: '★';
+  color: var(--tt-yellow);
+}
+
+/* Loading skeleton with block characters */
+.skeleton {
+  color: var(--tt-cyan);
+  opacity: 0.3;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.5; }
+}
+
+.skeleton-line {
+  height: 1.2em;
+  margin-bottom: 4px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 255, 0.1) 0%,
+    rgba(0, 255, 255, 0.2) 50%,
+    rgba(0, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Value indicators with block characters */
+.value-positive {
+  color: var(--tt-green);
+}
+
+.value-positive::before {
+  content: '▲ ';
+}
+
+.value-negative {
+  color: var(--tt-red);
+}
+
+.value-negative::before {
+  content: '▼ ';
+}
+
+/* Block-style badges */
+.block-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 0.85em;
+}
+
+.block-badge-success {
+  background: var(--tt-green);
+  color: var(--tt-black);
+}
+
+.block-badge-error {
+  background: var(--tt-red);
+  color: var(--tt-white);
+}
+
+.block-badge-warning {
+  background: var(--tt-yellow);
+  color: var(--tt-black);
+}
+
+.block-badge-info {
+  background: var(--tt-cyan);
+  color: var(--tt-black);
+}
+
+/* Flashing text for alerts (Req 32.2) */
+.block-flash {
+  animation: block-flash-anim 0.5s steps(1) infinite;
+}
+
+@keyframes block-flash-anim {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* ============================================
    SELECTION STYLES
    ============================================ */
 

@@ -17,7 +17,7 @@ import gsap from 'gsap';
 import { PAGE_NUMBERS } from '../router.js';
 import { getStateManager } from '../state.js';
 import { formatTeletextDate } from '../utils/date.js';
-import { formatDottedLeader, centerText, createSeparator } from '../utils/teletext.js';
+import { formatDottedLeader, centerText, createSeparator, BLOCK_CHARS, createBulletPoint } from '../utils/teletext.js';
 import { getLocation } from '../services/geoApi.js';
 import { getCurrentWeather, formatTemperature } from '../services/weatherApi.js';
 
@@ -56,6 +56,7 @@ const MENU_ITEMS = [
  */
 const TIPS = [
   'TIP: Press ? for keyboard shortcuts',
+  'TIP: ↑↑↓↓←→←→BA = RAINBOW BURST MODE!',
   'TIP: Teletext launched in 1974 on BBC',
   'TIP: Use number keys 1-9 for quick nav',
   'TIP: Ceefax served 20M UK viewers',
@@ -65,6 +66,7 @@ const TIPS = [
   'TIP: Time Machine goes back to 1940!',
   'TIP: Teletext used only 8 colours',
   'TIP: Each page had max 24 lines of text',
+  'TIP: Press 7 for Easter Egg page!',
 ];
 
 /**
@@ -150,8 +152,9 @@ export function render() {
   const weatherText = formatWeatherWidget(weatherCache, settings.location, unit);
   
   // Build menu items with dotted leaders (Req 4.4)
+  // Using block character bullet from BLOCK_CHARS for authentic Teletext feel
   const menuHTML = MENU_ITEMS.map((item, index) => {
-    const formattedLine = formatDottedLeader(`► ${item.label}`, item.page.toString(), 36);
+    const formattedLine = formatDottedLeader(`${BLOCK_CHARS.BULLET} ${item.label}`, item.page.toString(), 36);
     return `<div class="menu-item content-line" data-page="${item.page}" data-index="${index}">${formattedLine}</div>`;
   }).join('\n');
   

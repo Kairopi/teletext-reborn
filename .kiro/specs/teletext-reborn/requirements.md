@@ -137,13 +137,20 @@ The project targets the "Resurrection" category of the hackathon, bringing dead 
 
 #### Acceptance Criteria
 
-1. WHEN the news page loads THEN the System SHALL fetch and display current headlines from a news API (NewsData.io or similar)
+1. WHEN the news page loads THEN the System SHALL fetch and display current headlines from a news API (BBC RSS via RSS2JSON, with NewsData.io fallback)
 2. WHEN displaying news THEN the System SHALL show headlines in categories: Top Stories (101), World (102), Technology (103), Business (104), Sports (105)
 3. WHEN a headline is displayed THEN the System SHALL show the headline text, source, and time since publication
 4. WHEN news data is loading THEN the System SHALL display an animated "LOADING..." text with blinking cursor
 5. WHEN news API fails THEN the System SHALL display a graceful error message and offer to retry
 6. WHEN displaying headlines THEN the System SHALL limit text to fit the 40-character Teletext line width, truncating with ellipsis if necessary
 7. WHEN the news page is displayed THEN the System SHALL auto-refresh data every 5 minutes without disrupting the user experience
+8. WHEN displaying headlines THEN the System SHALL show up to 10 headlines per category with scrollable content area
+9. WHEN a headline is clicked THEN the System SHALL open the full article in a new browser tab
+10. WHEN displaying headlines THEN the System SHALL show a bookmark icon (☆/★) next to each headline
+11. WHEN a user clicks the bookmark icon THEN the System SHALL toggle the bookmark state and persist to localStorage
+12. WHEN displaying category navigation THEN the System SHALL include a "★ SAVED" tab showing bookmarked articles count
+13. WHEN viewing the SAVED tab THEN the System SHALL display all bookmarked articles (max 20 stored)
+14. WHEN displaying news attribution THEN the System SHALL show "VIA BBC NEWS" at the bottom of the page
 
 ### Requirement 6: Live Mode - Weather Section (Pages 200-209)
 

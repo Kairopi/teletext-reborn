@@ -548,6 +548,16 @@ This implementation plan transforms the Teletext Reborn design into actionable c
     - Category navigation (Top, World, Tech, Business, Sports)
     - Auto-refresh every 5 minutes
     - _Requirements: 5.1-5.7_
+  - [x] 27.2 **ENHANCED: News UX/UI Improvements (Dec 2025)**
+    - Increased headlines from 5 to 10 per category
+    - Added bookmark/favorites feature with localStorage persistence
+    - Added "★ SAVED" tab showing bookmarked articles (max 20)
+    - Headlines are clickable - open BBC articles in new tab
+    - Keyboard accessible (Enter/Space to activate)
+    - Compact headline styling for better fit
+    - Scrollable content area for overflow
+    - Attribution updated to "VIA BBC NEWS"
+    - _Requirements: 5.1-5.7, UX Excellence_
 
 - [x] 28. Implement Weather Pages (src/js/pages/weather.js) - Pages 200-209
 
@@ -700,24 +710,25 @@ This implementation plan transforms the Teletext Reborn design into actionable c
     - Verify generate URL then parse returns same date
     - **Validates: Requirements 17.2, 17.3**
 
-- [ ] 35. Implement Easter eggs system
-  - [ ] 35.1 Create Konami code detection
+- [x] 35. Implement Easter eggs system ✅
+  - [x] 35.1 Create Konami code detection
     - Listen for ↑↑↓↓←→←→BA sequence
     - Activate Color Burst mode with rainbow animations
     - _Requirements: 18.2_
-  - [ ] 35.2 Create special pages
-    - Page 888: Teletext facts
-    - Page 404: Humorous not found
+  - [x] 35.2 Create special pages
+    - Page 888: Teletext facts (rotating fun facts about Teletext history)
+    - Page 404: Humorous not found (random funny messages)
     - _Requirements: 18.1, 18.5_
-  - [ ] 35.3 Create special date handlers
+  - [x] 35.3 Create special date handlers
     - Y2K countdown on Dec 31, 1999
     - Birthday confetti animation
     - _Requirements: 18.3, 18.4_
 
-- [ ] 36. Implement keyboard shortcuts overlay
-  - [ ] 36.1 Create shortcuts modal
+- [x] 36. Implement keyboard shortcuts overlay ✅
+  - [x] 36.1 Create shortcuts modal
     - Display on "?" key press
-    - List all keyboard shortcuts
+    - List all keyboard shortcuts (1-9, arrows, ESC)
+    - Shows secret Konami code hint
     - Dismiss on any key or click outside
     - _Requirements: 19.1-19.4_
 
@@ -859,7 +870,7 @@ This implementation plan transforms the Teletext Reborn design into actionable c
 | 2 | Visual Design | 2.1-2.4, 12.3, 14.2 |
 | 3 | Navigation | 5.1, 10.1, 15.1-15.2 |
 | 4 | Home Page | 26.1-26.2 |
-| 5 | News Section | 22.1, 27.1 |
+| 5 | News Section | 22.1, 27.1-27.2 ✅ (Enhanced with bookmarks) |
 | 6 | Weather Section | 20.1, 28.1-28.2 |
 | 7 | Finance Section | 23.1, 29.1 |
 | 8 | Time Machine Date | 7.1, 30.1 |
@@ -902,6 +913,7 @@ This implementation plan transforms the Teletext Reborn design into actionable c
 **Enhanced Features Completed:**
 - ✅ Enhanced Time Machine "Today in History" (Req 34) - History.com-inspired experience
 - ✅ Enhanced Wikipedia API (Req 35) - 50 events, 25 births, 15 deaths, holidays support
+- ✅ Enhanced News Section (Req 5) - Bookmarks, 10 headlines, clickable links, BBC RSS feeds
 
 **Estimated Build Time:** 5 days
 - Day 1: Foundation + Core Infrastructure (Tasks 1-8)

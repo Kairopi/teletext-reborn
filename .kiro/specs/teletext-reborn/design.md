@@ -1018,6 +1018,48 @@ fc.assert(
 └─────────────────────────────────────────┘
 ```
 
+### News Page (101-109) Layout
+
+```
+┌─────────────────────────────────────────┐
+│ TELETEXT        P.101        12:45:30   │
+├─────────────────────────────────────────┤
+│                                         │
+│      📰 NEWS HEADLINES                  │
+│                                         │
+│   [TOP] [WORLD] [TECH] [BIZ] [★ SAVED]  │
+│                                         │
+│   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
+│                                         │
+│   ☆ BREAKING: MAJOR EVENT HAPPENS...    │
+│     BBC NEWS • 5 MINS AGO    [READ ↗]   │
+│                                         │
+│   ★ TECH GIANT ANNOUNCES NEW PRODUCT    │
+│     BBC NEWS • 1 HOUR AGO    [READ ↗]   │
+│                                         │
+│   ☆ WORLD LEADERS MEET FOR SUMMIT...    │
+│     BBC NEWS • 2 HOURS AGO   [READ ↗]   │
+│                                         │
+│   (scrollable - up to 10 headlines)     │
+│                                         │
+│   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
+│   VIA BBC NEWS                          │
+│                                         │
+├─────────────────────────────────────────┤
+│ 🔴Top  🟢World  🟡Tech  🔵Business       │
+│ [◄PREV]      [___]      [NEXT►]         │
+└─────────────────────────────────────────┘
+```
+
+**News Page Features:**
+- **10 headlines per category** (scrollable content area)
+- **Clickable headlines** - opens full article in new tab
+- **Bookmark icons** (☆/★) - save articles for later
+- **★ SAVED tab** - view bookmarked articles (max 20)
+- **Category tabs** - TOP, WORLD, TECH, BIZ, SPORTS
+- **Attribution** - "VIA BBC NEWS" footer
+- **Auto-refresh** - every 5 minutes
+
 ### Time Machine (500) Layout
 
 ```

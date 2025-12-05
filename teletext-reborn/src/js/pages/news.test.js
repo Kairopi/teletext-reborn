@@ -199,7 +199,7 @@ describe('News Page', () => {
     it('should render attribution (Req 22.1)', () => {
       const html = render(101);
       
-      expect(html).toContain('VIA NEWSDATA.IO');
+      expect(html).toContain('VIA BBC NEWS');
     });
     
     it('should render stale notice when data is stale', () => {
@@ -392,7 +392,7 @@ describe('News Page', () => {
             
             // Check that category labels are uppercase
             expect(html).toContain('TOP STORIES');
-            expect(html).toContain('VIA NEWSDATA.IO');
+            expect(html).toContain('VIA BBC NEWS');
             
             return true;
           }
@@ -505,7 +505,7 @@ describe('News Page', () => {
   // ============================================
   
   describe('Line Width Constraint (Req 5.6)', () => {
-    it('should truncate long headlines', () => {
+    it('should truncate long headlines in display', () => {
       const longTitle = 'A'.repeat(100);
       const mockData = {
         category: 'top',
@@ -521,8 +521,12 @@ describe('News Page', () => {
       setMockNewsData(mockData);
       const html = render(101);
       
-      // The full 100-char title should not appear
-      expect(html).not.toContain(longTitle);
+      // The headline-title div should contain truncated text (with ellipsis)
+      // The full 100-char title should not appear as visible text
+      expect(html).toContain('headline-title');
+      // Should contain truncated version (36 chars max + ellipsis)
+      // Note: Uses proper Unicode ellipsis (…) not three dots (...)
+      expect(html).toContain('A'.repeat(33) + '…');
     });
   });
 });

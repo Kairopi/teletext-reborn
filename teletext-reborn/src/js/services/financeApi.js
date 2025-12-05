@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Teletext Reborn - Finance API Service
  * 
  * Integrates with Coinlore API for cryptocurrency prices.
@@ -130,6 +130,7 @@ export function resetRateLimits() {
 export function getCacheKey(type) {
   return 'crypto_' + type;
 }
+
 /**
  * Format price for display (Req 7.4)
  * @param {number} price - Price in USD
@@ -139,18 +140,18 @@ export function formatPrice(price) {
   if (typeof price !== 'number' || isNaN(price)) {
     return 'N/A';
   }
-
+  const dollar = '$';
   if (price >= 1000) {
-    return '$' + price.toLocaleString('en-US', {
+    return dollar + price.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
   } else if (price >= 1) {
-    return '$' + price.toFixed(2);
+    return dollar + price.toFixed(2);
   } else if (price >= 0.01) {
-    return '$' + price.toFixed(4);
+    return dollar + price.toFixed(4);
   } else {
-    return '$' + price.toFixed(6);
+    return dollar + price.toFixed(6);
   }
 }
 
@@ -192,6 +193,7 @@ export function formatCryptoName(name, maxWidth = 15) {
   if (typeof name !== 'string') return '';
   return truncateToWidth(name, maxWidth);
 }
+
 
 // ============================================
 // Data Parsing
@@ -250,6 +252,7 @@ export function getCachedCryptoPrices() {
   }
   return null;
 }
+
 // ============================================
 // Main API Functions
 // ============================================
@@ -326,6 +329,7 @@ export async function getCryptoPrices() {
     throw error;
   }
 }
+
 
 // ============================================
 // Display Formatting
@@ -414,6 +418,7 @@ export function getRateLimitNotice(resetInMs) {
   const minutes = Math.ceil(seconds / 60);
   return 'USING CACHED DATA - REFRESH IN ' + minutes + 'M';
 }
+
 // ============================================
 // Mock Data for Development/Testing
 // ============================================

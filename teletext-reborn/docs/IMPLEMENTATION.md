@@ -1784,7 +1784,7 @@ IP-based location detection service using IP-API for weather and other location-
 
 ---
 
-*Last Updated: December 4, 2025*
+*Last Updated: December 5, 2025*
 
 
 ---
@@ -1886,15 +1886,15 @@ export function getFastextButtons(): Object // Fastext button config
 
 ---
 
-### Task 27: News Pages ✅
+### Task 27: News Pages ✅ (Enhanced Dec 2025)
 **File:** `src/js/pages/news.js`, `src/js/pages/news.test.js`
-**Status:** Completed
+**Status:** Completed + Enhanced
 
 #### What was implemented:
 
 **News Page Component (`news.js`):**
 
-A page component for displaying news headlines in authentic Teletext format, supporting multiple categories.
+A page component for displaying news headlines in authentic Teletext format, supporting multiple categories with clickable links and bookmark functionality.
 
 **Page Interface:**
 - `render(pageNumber)` - Renders news page HTML for given page number
@@ -1905,42 +1905,68 @@ A page component for displaying news headlines in authentic Teletext format, sup
 **Features Implemented (Req 5.1-5.7):**
 
 1. **News Headlines Display (Req 5.1, 5.3):**
-   - Fetches headlines from NewsData.io API
+   - Fetches headlines from BBC RSS feeds via RSS2JSON (primary)
+   - Falls back to NewsData.io API, then mock data
    - Shows headline title, source, and time since publication
-   - Maximum 8 headlines per page
+   - **Maximum 10 headlines per page** (scrollable)
+   - **Clickable headlines** - opens full article in new tab
+   - **"READ ↗" link** on each headline
 
 2. **Category Navigation (Req 5.2):**
    - Top Stories (101), World (102), Technology (103), Business (104), Sports (105)
    - Interactive category tabs with active state highlighting
    - Fastext buttons for quick category switching
+   - **★ SAVED tab** - view bookmarked articles
 
-3. **Loading State (Req 5.4):**
+3. **Bookmark Feature (NEW):**
+   - **☆/★ bookmark icons** on each headline
+   - Click to save articles for later reading
+   - Bookmarks stored in localStorage (`teletext_news_bookmarks`)
+   - Maximum 20 bookmarks stored
+   - Bookmarks view shows saved articles count
+   - Can remove bookmarks by clicking ★ again
+
+4. **Loading State (Req 5.4):**
    - Animated "LOADING…" text with blinking cursor
    - GSAP-powered cursor blink animation
 
-4. **Error Handling (Req 5.5):**
+5. **Error Handling (Req 5.5):**
    - Graceful error display with ⚠ icon
    - RETRY and HOME buttons for recovery
    - Falls back to cached data when available
 
-5. **Line Width Constraint (Req 5.6):**
+6. **Line Width Constraint (Req 5.6):**
    - Headlines truncated to 38 characters (with ellipsis)
-   - Source names truncated to 12 characters
+   - Source names truncated to 8 characters
    - All text converted to UPPERCASE for authenticity
 
-6. **Auto-Refresh (Req 5.7):**
+7. **Auto-Refresh (Req 5.7):**
    - Refreshes data every 5 minutes
    - Non-disruptive background updates
    - Uses newsApi.js auto-refresh system
 
-7. **Data Attribution (Req 22.1):**
-   - "VIA NEWSDATA.IO" footer attribution
+8. **Data Attribution (Req 22.1):**
+   - "VIA BBC NEWS" footer attribution
+
+**Enhanced UI/UX (Dec 2025):**
+- Compact headline layout with cyan left border
+- Hover effects on clickable headlines (GSAP)
+- Scrollable content area for 10 headlines
+- Better visual hierarchy with source/time metadata
+- Keyboard accessible (Enter/Space to activate links)
+
+**Bookmark Functions:**
+- `getBookmarks()` - Get all bookmarked articles from localStorage
+- `saveBookmarks(bookmarks)` - Save bookmarks to localStorage
+- `isBookmarked(link)` - Check if article is bookmarked
+- `toggleBookmark(article)` - Add/remove bookmark
 
 **State Management:**
 - `newsData` - Current news data cache
 - `currentPageNumber` - Current page being displayed
 - `isLoading` - Loading state flag
 - `errorState` - Error information
+- `viewMode` - 'news' or 'bookmarks'
 - `autoRefreshUnsubscribe` - Cleanup function for auto-refresh
 
 **Utility Functions:**
@@ -2294,7 +2320,8 @@ A multi-page component for the Time Machine feature that allows users to explore
 | Home Page | 32 | ✅ All Passing |
 | News Page | 25 | ✅ All Passing |
 | Weather Page | 33 | ✅ All Passing |
-| **Total** | **690** | ✅ **All Passing** |
+| News API | 32 | ✅ All Passing |
+| **Total** | **697** | ✅ **All Passing** |
 
 ---
 
@@ -2467,4 +2494,30 @@ const PAGE_REGISTRY = {
 
 ---
 
-*Last Updated: December 4, 2025*
+## Test Results Summary
+
+| Test Suite | Tests | Status |
+|------------|-------|--------|
+| Color Utilities | 21 | ✅ Passing |
+| State Management | 16 | ✅ Passing |
+| Router | 24 | ✅ Passing |
+| Teletext Utilities | 41 | ✅ Passing |
+| Date Utilities | 51 | ✅ Passing |
+| Boot Animation | 29 | ✅ Passing |
+| Page Transitions | 28 | ✅ Passing |
+| Time Travel Animation | 47 | ✅ Passing |
+| Effects/Micro-interactions | 95 | ✅ Passing |
+| API Base | 35 | ✅ Passing |
+| Weather API | 39 | ✅ Passing |
+| News API | 32 | ✅ Passing |
+| Finance API | 53 | ✅ Passing |
+| Wikipedia API | 47 | ✅ Passing |
+| Geo API | 49 | ✅ Passing |
+| Home Page | 32 | ✅ Passing |
+| News Page | 25 | ✅ Passing |
+| Weather Page | 33 | ✅ Passing |
+| **Total** | **697** | ✅ **All Passing** |
+
+---
+
+*Last Updated: December 5, 2025*

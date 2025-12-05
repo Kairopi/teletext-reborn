@@ -55,7 +55,7 @@ const VALID_PAGE_RANGES = [
   { min: 200, max: 209 },  // Weather
   { min: 300, max: 309 },  // Finance
   { min: 404, max: 404 },  // Not Found (special)
-  { min: 500, max: 502 },  // Time Machine
+  { min: 500, max: 504 },  // Time Machine (extended for event detail/timeline)
   { min: 888, max: 888 },  // Easter Egg
   { min: 900, max: 900 },  // Settings
   { min: 999, max: 999 },  // About
@@ -100,8 +100,11 @@ class PageRouter {
    * @returns {Promise<boolean>} True if navigation succeeded, false otherwise
    */
   async navigate(pageNumber) {
+    console.log(`[Router] navigate() called with: ${pageNumber}`);
+    
     // Don't navigate if disabled (e.g., during animations)
     if (this._navigationDisabled) {
+      console.log('[Router] Navigation disabled, returning false');
       return false;
     }
 
@@ -112,19 +115,23 @@ class PageRouter {
       page = parseInt(pageNumber, 10);
     } catch {
       // If conversion fails (e.g., object with throwing toString), return false
+      console.log('[Router] Failed to parse page number');
       return false;
     }
     
     if (isNaN(page)) {
+      console.log('[Router] Page is NaN, returning false');
       return false;
     }
 
     // Check if page is valid
     if (!this._isValidPage(page)) {
+      console.log(`[Router] Page ${page} is not valid, navigating to 404`);
       // Navigate to 404 page for invalid pages (Requirement 3.5)
       return this._performNavigation(PAGE_NUMBERS.NOT_FOUND);
     }
 
+    console.log(`[Router] Page ${page} is valid, performing navigation`);
     return this._performNavigation(page);
   }
 
@@ -297,12 +304,14 @@ class PageRouter {
    */
   initKeyboardShortcuts() {
     if (this._keyboardListenersAttached) {
+      console.log('[Router] Keyboard shortcuts already attached, skipping');
       return;
     }
 
     this._keyboardHandler = this._handleKeyDown.bind(this);
     document.addEventListener('keydown', this._keyboardHandler);
     this._keyboardListenersAttached = true;
+    console.log('[Router] Keyboard shortcuts initialized');
   }
 
   /**
@@ -345,8 +354,10 @@ class PageRouter {
     // Requirement 3.3: Number keys 1-9 navigate to quick-access pages
     if (/^[1-9]$/.test(key)) {
       const pageNumber = QUICK_ACCESS_PAGES[parseInt(key, 10)];
+      console.log(`[Router] Number key ${key} pressed, navigating to page ${pageNumber}`);
       if (pageNumber) {
         event.preventDefault();
+        event.stopPropagation();
         this.navigate(pageNumber);
       }
       return;

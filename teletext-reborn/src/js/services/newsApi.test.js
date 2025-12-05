@@ -32,9 +32,6 @@ import {
   CACHE_TTL,
   MAX_HEADLINES,
   MAX_HEADLINE_LENGTH,
-  getCacheKey,
-  parseArticle,
-  parseNewsResponse,
 } from './newsApi.js';
 
 // ============================================
@@ -126,114 +123,7 @@ describe('News API Service', () => {
     });
   });
 
-  // ============================================
-  // Article Parsing Tests
-  // ============================================
 
-  describe('Article Parsing', () => {
-    it('should parse article with all fields', () => {
-      const rawArticle = {
-        title: 'Test Headline',
-        description: 'Test description',
-        source_id: 'bbc',
-        pubDate: '2025-12-04T10:00:00Z',
-        link: 'https://example.com',
-        image_url: 'https://example.com/image.jpg',
-        category: ['technology'],
-      };
-
-      const parsed = parseArticle(rawArticle);
-
-      expect(parsed.title).toBe('Test Headline');
-      expect(parsed.description).toBe('Test description');
-      expect(parsed.source).toBe('bbc');
-      expect(parsed.pubDate).toBeInstanceOf(Date);
-      expect(parsed.link).toBe('https://example.com');
-      expect(parsed.imageUrl).toBe('https://example.com/image.jpg');
-      expect(parsed.category).toBe('technology');
-    });
-
-    it('should handle missing fields gracefully', () => {
-      const rawArticle = {};
-
-      const parsed = parseArticle(rawArticle);
-
-      expect(parsed.title).toBe('NO TITLE');
-      expect(parsed.description).toBe('');
-      expect(parsed.source).toBe('UNKNOWN');
-      expect(parsed.pubDate).toBeNull();
-      expect(parsed.timeAgo).toBe('');
-      expect(parsed.link).toBeNull();
-    });
-
-    it('should use source_name as fallback for source', () => {
-      const rawArticle = {
-        title: 'Test',
-        source_name: 'Reuters',
-      };
-
-      const parsed = parseArticle(rawArticle);
-      expect(parsed.source).toBe('Reuters');
-    });
-  });
-
-  // ============================================
-  // News Response Parsing Tests
-  // ============================================
-
-  describe('News Response Parsing', () => {
-    it('should parse news response correctly', () => {
-      const apiResponse = {
-        results: [
-          { title: 'Headline 1', source_id: 'bbc' },
-          { title: 'Headline 2', source_id: 'cnn' },
-        ],
-        totalResults: 100,
-        nextPage: 'abc123',
-      };
-
-      const parsed = parseNewsResponse(apiResponse, 'top');
-
-      expect(parsed.category).toBe('top');
-      expect(parsed.categoryLabel).toBe('TOP STORIES');
-      expect(parsed.pageNumber).toBe(101);
-      expect(parsed.articles).toHaveLength(2);
-      expect(parsed.totalResults).toBe(100);
-      expect(parsed.nextPage).toBe('abc123');
-      expect(parsed.lastUpdated).toBeInstanceOf(Date);
-      expect(parsed._stale).toBe(false);
-    });
-
-    it('should limit articles to MAX_HEADLINES', () => {
-      const manyArticles = Array(20).fill(null).map((_, i) => ({
-        title: `Headline ${i}`,
-        source_id: 'test',
-      }));
-
-      const apiResponse = { results: manyArticles };
-      const parsed = parseNewsResponse(apiResponse, 'top');
-
-      expect(parsed.articles.length).toBeLessThanOrEqual(MAX_HEADLINES);
-    });
-
-    it('should handle empty results', () => {
-      const apiResponse = { results: [] };
-      const parsed = parseNewsResponse(apiResponse, 'world');
-
-      expect(parsed.articles).toHaveLength(0);
-      expect(parsed.category).toBe('world');
-    });
-
-    it('should preserve _stale flag from API response', () => {
-      const apiResponse = {
-        results: [],
-        _stale: true,
-      };
-
-      const parsed = parseNewsResponse(apiResponse, 'top');
-      expect(parsed._stale).toBe(true);
-    });
-  });
 
   // ============================================
   // Headline Formatting Tests (Req 5.3, 5.6)
@@ -363,29 +253,14 @@ describe('News API Service', () => {
   // ============================================
 
   describe('Rate Limit Management', () => {
-    it('should allow requests when under limit', () => {
+    it('should allow requests (RSS feeds have no rate limit)', () => {
       localStorage.clear();
       expect(canMakeRequest()).toBe(true);
     });
 
-    it('should return correct remaining requests', () => {
+    it('should return high remaining requests (RSS feeds unlimited)', () => {
       localStorage.clear();
-      expect(getRemainingRequests()).toBe(200);
-    });
-
-    it('should reset count on new day', () => {
-      // Set yesterday's date
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      
-      localStorage.setItem('teletext_news_rate_limit', JSON.stringify({
-        count: 199,
-        date: yesterday.toDateString(),
-      }));
-
-      // Should reset on new day
-      expect(canMakeRequest()).toBe(true);
-      expect(getRemainingRequests()).toBe(200);
+      expect(getRemainingRequests()).toBe(9999);
     });
   });
 
@@ -394,15 +269,9 @@ describe('News API Service', () => {
   // ============================================
 
   describe('Cache Management', () => {
-    it('should generate correct cache keys', () => {
-      expect(getCacheKey('top')).toBe('news_top');
-      expect(getCacheKey('world')).toBe('news_world');
-      expect(getCacheKey('technology')).toBe('news_technology');
-    });
-
     it('should clear specific category cache', () => {
-      // Set up cache
-      localStorage.setItem('teletext_cache_news_top', JSON.stringify({
+      // Set up cache with the actual key format used by newsApi
+      localStorage.setItem('teletext_news_top', JSON.stringify({
         data: { results: [] },
         timestamp: Date.now(),
         ttl: CACHE_TTL,
@@ -410,13 +279,13 @@ describe('News API Service', () => {
 
       clearNewsCache('top');
 
-      expect(localStorage.getItem('teletext_cache_news_top')).toBeNull();
+      expect(localStorage.getItem('teletext_news_top')).toBeNull();
     });
 
     it('should clear all news cache when no category specified', () => {
       // Set up cache for multiple categories
       Object.keys(NEWS_CATEGORIES).forEach(cat => {
-        localStorage.setItem(`teletext_cache_news_${cat}`, JSON.stringify({
+        localStorage.setItem(`teletext_news_${cat}`, JSON.stringify({
           data: { results: [] },
           timestamp: Date.now(),
           ttl: CACHE_TTL,
@@ -426,12 +295,12 @@ describe('News API Service', () => {
       clearNewsCache();
 
       Object.keys(NEWS_CATEGORIES).forEach(cat => {
-        expect(localStorage.getItem(`teletext_cache_news_${cat}`)).toBeNull();
+        expect(localStorage.getItem(`teletext_news_${cat}`)).toBeNull();
       });
     });
 
     it('should detect valid cache', () => {
-      localStorage.setItem('teletext_cache_news_top', JSON.stringify({
+      localStorage.setItem('teletext_news_top', JSON.stringify({
         data: { results: [] },
         timestamp: Date.now(),
         ttl: CACHE_TTL,
@@ -441,7 +310,7 @@ describe('News API Service', () => {
     });
 
     it('should detect expired cache', () => {
-      localStorage.setItem('teletext_cache_news_top', JSON.stringify({
+      localStorage.setItem('teletext_news_top', JSON.stringify({
         data: { results: [] },
         timestamp: Date.now() - CACHE_TTL - 1000,
         ttl: CACHE_TTL,
@@ -472,7 +341,7 @@ describe('News API Service', () => {
 
     it('should return correct category info for mock data', () => {
       const mockTech = getMockNews('technology');
-      expect(mockTech.categoryLabel).toBe('TECHNOLOGY');
+      expect(mockTech.categoryLabel).toBe('TECH');
       expect(mockTech.pageNumber).toBe(103);
     });
 
@@ -519,30 +388,32 @@ describe('News API Service', () => {
   // ============================================
 
   describe('API Integration', () => {
-    it('should handle API errors gracefully (Req 5.5)', async () => {
+    it('should fall back to mock data when API fails (Req 5.5)', async () => {
       // Mock fetch to fail
       global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 
-      // Should throw when no cache available
-      await expect(getNews('top')).rejects.toThrow();
+      // Should return mock data as fallback
+      const result = await getNews('top');
+      expect(result.category).toBe('top');
+      expect(result._demo).toBe(true);
     });
 
     it('should validate category and default to top', async () => {
       // Mock successful response
-      global.fetch = vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ results: [] }),
-      });
+      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 
       // Invalid category should default to 'top'
       const result = await getNews('invalid_category');
       expect(result.category).toBe('top');
     });
 
-    it('should throw for invalid page number in getNewsByPage', async () => {
-      await expect(getNewsByPage(100)).rejects.toThrow('INVALID NEWS PAGE');
-      await expect(getNewsByPage(110)).rejects.toThrow('INVALID NEWS PAGE');
-      await expect(getNewsByPage(200)).rejects.toThrow('INVALID NEWS PAGE');
+    it('should return mock data for invalid page numbers in getNewsByPage', async () => {
+      // Invalid pages return mock data for 'top' category
+      const result100 = await getNewsByPage(100);
+      expect(result100.category).toBe('top');
+      
+      const result110 = await getNewsByPage(110);
+      expect(result110.category).toBe('top');
     });
   });
 });

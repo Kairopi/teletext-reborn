@@ -315,3 +315,219 @@ export function createSeparator(char = '━', width = MAX_LINE_WIDTH) {
   
   return sepChar.repeat(targetWidth);
 }
+
+// ============================================
+// BLOCK CHARACTER UTILITIES (Req 32.3, 32.5, 32.6)
+// Authentic Teletext decorative elements
+// ============================================
+
+/**
+ * Block characters for Teletext-authentic decorations
+ * @constant {Object}
+ */
+export const BLOCK_CHARS = {
+  FULL: '█',
+  UPPER_HALF: '▀',
+  LOWER_HALF: '▄',
+  LEFT_HALF: '▌',
+  RIGHT_HALF: '▐',
+  LIGHT_SHADE: '░',
+  MEDIUM_SHADE: '▒',
+  DARK_SHADE: '▓',
+  BULLET: '►',
+  BULLET_ALT: '•',
+  ARROW_RIGHT: '→',
+  ARROW_LEFT: '←',
+  ARROW_UP: '↑',
+  ARROW_DOWN: '↓',
+  STAR: '★',
+  STAR_EMPTY: '☆',
+  CHECK: '✓',
+  CROSS: '✗',
+};
+
+/**
+ * Separator styles using block characters
+ * @constant {Object}
+ */
+export const SEPARATOR_STYLES = {
+  HEAVY: '━',
+  DOUBLE: '═',
+  LIGHT: '─',
+  BLOCK: '█',
+  SHADE_LIGHT: '░',
+  SHADE_MEDIUM: '▒',
+  SHADE_DARK: '▓',
+  MIXED: '▀▄',
+};
+
+/**
+ * Create a decorative border using block characters
+ * Req 32.3: Decorative borders using block characters
+ * 
+ * @param {string} text - Text to wrap in border
+ * @param {string} [style='single'] - Border style: 'single', 'double', 'block', 'shade'
+ * @returns {string[]} Array of lines forming the bordered text
+ * 
+ * @example
+ * createBlockBorder('HELLO', 'block')
+ * // ['████████████', '█  HELLO  █', '████████████']
+ */
+export function createBlockBorder(text, style = 'single') {
+  const str = text === null || text === undefined ? '' : String(text);
+  const paddedText = ` ${str} `;
+  const width = Math.min(paddedText.length + 2, MAX_LINE_WIDTH);
+  
+  let topChar, sideChar, bottomChar;
+  
+  switch (style) {
+    case 'double':
+      topChar = '═';
+      sideChar = '║';
+      bottomChar = '═';
+      break;
+    case 'block':
+      topChar = '█';
+      sideChar = '█';
+      bottomChar = '█';
+      break;
+    case 'shade':
+      topChar = '▓';
+      sideChar = '▓';
+      bottomChar = '▓';
+      break;
+    default: // single
+      topChar = '━';
+      sideChar = '│';
+      bottomChar = '━';
+  }
+  
+  const topLine = topChar.repeat(width);
+  const bottomLine = bottomChar.repeat(width);
+  const middleLine = sideChar + paddedText.padEnd(width - 2) + sideChar;
+  
+  return [topLine, middleLine, bottomLine];
+}
+
+/**
+ * Create a progress bar using block characters
+ * Req 30.1: Loading animated block progress bar
+ * 
+ * @param {number} progress - Progress value 0-100
+ * @param {number} [width=20] - Width of progress bar
+ * @param {boolean} [showPercent=false] - Show percentage text
+ * @returns {string} Progress bar string
+ * 
+ * @example
+ * createProgressBar(50, 10) // '█████░░░░░'
+ * createProgressBar(75, 10, true) // '███████░░░ 75%'
+ */
+export function createProgressBar(progress, width = 20, showPercent = false) {
+  const clampedProgress = Math.max(0, Math.min(100, progress));
+  const filledCount = Math.round((clampedProgress / 100) * width);
+  const emptyCount = width - filledCount;
+  
+  const filled = BLOCK_CHARS.FULL.repeat(filledCount);
+  const empty = BLOCK_CHARS.LIGHT_SHADE.repeat(emptyCount);
+  const bar = filled + empty;
+  
+  if (showPercent) {
+    return `${bar} ${Math.round(clampedProgress)}%`;
+  }
+  
+  return bar;
+}
+
+/**
+ * Create a bullet point with proper formatting
+ * Req 32.6: Bullet points ► or • in cyan
+ * 
+ * @param {string} text - Text for bullet point
+ * @param {string} [bullet='►'] - Bullet character
+ * @returns {string} Formatted bullet point
+ */
+export function createBulletPoint(text, bullet = BLOCK_CHARS.BULLET) {
+  const str = text === null || text === undefined ? '' : String(text);
+  return `${bullet} ${str}`;
+}
+
+/**
+ * Create multiple bullet points
+ * 
+ * @param {string[]} items - Array of text items
+ * @param {string} [bullet='►'] - Bullet character
+ * @returns {string[]} Array of formatted bullet points
+ */
+export function createBulletList(items, bullet = BLOCK_CHARS.BULLET) {
+  if (!Array.isArray(items)) return [];
+  return items.map(item => createBulletPoint(item, bullet));
+}
+
+/**
+ * Create a decorative header with block characters
+ * 
+ * @param {string} text - Header text
+ * @param {string} [style='underline'] - Style: 'underline', 'box', 'banner'
+ * @returns {string[]} Array of lines forming the header
+ */
+export function createBlockHeader(text, style = 'underline') {
+  const str = text === null || text === undefined ? '' : String(text).toUpperCase();
+  
+  switch (style) {
+    case 'box':
+      return createBlockBorder(str, 'double');
+    case 'banner':
+      const bannerWidth = Math.min(str.length + 4, MAX_LINE_WIDTH);
+      return [
+        BLOCK_CHARS.DARK_SHADE.repeat(bannerWidth),
+        `${BLOCK_CHARS.DARK_SHADE} ${str} ${BLOCK_CHARS.DARK_SHADE}`,
+        BLOCK_CHARS.DARK_SHADE.repeat(bannerWidth),
+      ];
+    default: // underline
+      return [
+        str,
+        SEPARATOR_STYLES.DOUBLE.repeat(str.length),
+      ];
+  }
+}
+
+/**
+ * Create a loading skeleton placeholder
+ * Req 45.2: Block-based skeleton placeholders
+ * 
+ * @param {number} [width=20] - Width of skeleton
+ * @param {number} [lines=1] - Number of lines
+ * @returns {string[]} Array of skeleton lines
+ */
+export function createSkeleton(width = 20, lines = 1) {
+  const skeletonLine = BLOCK_CHARS.LIGHT_SHADE.repeat(width);
+  return Array(lines).fill(skeletonLine);
+}
+
+/**
+ * Format a value with block-style indicator
+ * For showing positive/negative with visual indicator
+ * 
+ * @param {number} value - Numeric value
+ * @param {string} [format='arrow'] - Format: 'arrow', 'block', 'bar'
+ * @returns {string} Formatted value with indicator
+ */
+export function formatValueIndicator(value, format = 'arrow') {
+  const isPositive = value >= 0;
+  const absValue = Math.abs(value);
+  
+  switch (format) {
+    case 'block':
+      return isPositive 
+        ? `${BLOCK_CHARS.UPPER_HALF} +${absValue}`
+        : `${BLOCK_CHARS.LOWER_HALF} -${absValue}`;
+    case 'bar':
+      const barLength = Math.min(Math.ceil(absValue / 10), 10);
+      const bar = BLOCK_CHARS.FULL.repeat(barLength);
+      return isPositive ? `+${bar}` : `-${bar}`;
+    default: // arrow
+      return isPositive 
+        ? `${BLOCK_CHARS.ARROW_UP} +${absValue}`
+        : `${BLOCK_CHARS.ARROW_DOWN} -${absValue}`;
+  }
+}

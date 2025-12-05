@@ -451,6 +451,187 @@ export function createBlockProgress(element, duration = 2, onComplete) {
 }
 
 /**
+ * Create an enhanced animated block progress bar with color transitions
+ * Req 30.1: Loading animated block progress bar ░░░░░░░░░░ → ██████████
+ * 
+ * @param {HTMLElement} container - Container element for progress bar
+ * @param {Object} options - Configuration options
+ * @param {number} [options.duration=2] - Animation duration in seconds
+ * @param {number} [options.blocks=20] - Number of blocks
+ * @param {boolean} [options.showPercent=false] - Show percentage
+ * @param {boolean} [options.loop=false] - Loop the animation
+ * @param {Function} [options.onComplete] - Callback when complete
+ * @returns {Object} Controller with start, stop, setProgress methods
+ */
+export function createAnimatedProgressBar(container, options = {}) {
+  if (!container) return null;
+  
+  const {
+    duration = 2,
+    blocks = 20,
+    showPercent = false,
+    loop = false,
+    onComplete
+  } = options;
+  
+  const emptyBlock = '░';
+  const filledBlock = '█';
+  
+  let timeline = null;
+  let currentProgress = 0;
+  
+  // Create the progress bar HTML
+  function render(progress) {
+    const filledCount = Math.round((progress / 100) * blocks);
+    const emptyCount = blocks - filledCount;
+    
+    const filled = `<span class="block-progress-filled">${filledBlock.repeat(filledCount)}</span>`;
+    const empty = `<span class="block-progress-empty">${emptyBlock.repeat(emptyCount)}</span>`;
+    const percent = showPercent ? ` <span class="block-progress-percent">${Math.round(progress)}%</span>` : '';
+    
+    container.innerHTML = `<div class="block-progress-animated">${filled}${empty}${percent}</div>`;
+  }
+  
+  // Initialize
+  render(0);
+  
+  /**
+   * Start the progress animation
+   */
+  function start() {
+    if (timeline) timeline.kill();
+    
+    currentProgress = 0;
+    render(0);
+    
+    timeline = gsap.timeline({
+      repeat: loop ? -1 : 0,
+      onComplete: () => {
+        if (onComplete) onComplete();
+      }
+    });
+    
+    // Animate progress from 0 to 100
+    timeline.to({ progress: 0 }, {
+      progress: 100,
+      duration,
+      ease: 'none',
+      onUpdate: function() {
+        currentProgress = this.targets()[0].progress;
+        render(currentProgress);
+      }
+    });
+    
+    return timeline;
+  }
+  
+  /**
+   * Stop the animation
+   */
+  function stop() {
+    if (timeline) {
+      timeline.kill();
+      timeline = null;
+    }
+  }
+  
+  /**
+   * Set progress to a specific value
+   * @param {number} progress - Progress value 0-100
+   */
+  function setProgress(progress) {
+    currentProgress = Math.max(0, Math.min(100, progress));
+    render(currentProgress);
+  }
+  
+  /**
+   * Get current progress
+   * @returns {number} Current progress 0-100
+   */
+  function getProgress() {
+    return currentProgress;
+  }
+  
+  return { start, stop, setProgress, getProgress, render };
+}
+
+/**
+ * Create a simple loading indicator with block characters
+ * Shows: ░░░░░░░░░░ with animated fill
+ * 
+ * @param {HTMLElement} element - Element to show loading in
+ * @param {string} [text='LOADING'] - Loading text
+ * @returns {Object} Controller with start, stop methods
+ */
+export function createBlockLoadingIndicator(element, text = 'LOADING') {
+  if (!element) return null;
+  
+  let timeline = null;
+  let cursorTween = null;
+  
+  function start() {
+    // Create loading HTML
+    element.innerHTML = `
+      <div class="block-loading" style="text-align: center;">
+        <div class="block-loading-text" style="color: var(--tt-yellow); margin-bottom: 8px;">
+          ${text}<span class="block-loading-cursor" style="color: var(--tt-cyan);">█</span>
+        </div>
+        <div class="block-loading-bar" style="color: var(--tt-cyan);">░░░░░░░░░░░░░░░░░░░░</div>
+      </div>
+    `;
+    
+    const cursor = element.querySelector('.block-loading-cursor');
+    const bar = element.querySelector('.block-loading-bar');
+    
+    // Blink cursor
+    if (cursor) {
+      cursorTween = gsap.to(cursor, {
+        opacity: 0,
+        duration: 0.53,
+        repeat: -1,
+        yoyo: true,
+        ease: 'steps(1)'
+      });
+    }
+    
+    // Animate progress bar
+    if (bar) {
+      const blocks = 20;
+      const emptyBlock = '░';
+      const filledBlock = '█';
+      
+      timeline = gsap.timeline({ repeat: -1 });
+      
+      for (let i = 0; i <= blocks; i++) {
+        timeline.call(() => {
+          bar.textContent = filledBlock.repeat(i) + emptyBlock.repeat(blocks - i);
+        }, null, i * 0.1);
+      }
+      
+      // Reset after completing
+      timeline.call(() => {
+        bar.textContent = emptyBlock.repeat(blocks);
+      }, null, (blocks + 1) * 0.1);
+    }
+    
+    return { timeline, cursorTween };
+  }
+  
+  function stop() {
+    if (timeline) {
+      timeline.kill();
+      timeline = null;
+    }
+    if (cursorTween) {
+      cursorTween.kill();
+      cursorTween = null;
+    }
+  }
+  
+  return { start, stop };
+}
+
+/**
  * Create rotating spinner animation
  * Req 26.4: ◐ → ◓ → ◑ → ◒
  * 

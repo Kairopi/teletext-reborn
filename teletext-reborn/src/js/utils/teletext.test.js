@@ -443,3 +443,212 @@ describe('Line Width Constraint (Property 7)', () => {
     });
   });
 });
+
+
+// ============================================
+// BLOCK CHARACTER UTILITIES TESTS (Req 32.3, 32.5, 32.6)
+// ============================================
+
+import {
+  BLOCK_CHARS,
+  SEPARATOR_STYLES,
+  createBlockBorder,
+  createProgressBar,
+  createBulletPoint,
+  createBulletList,
+  createBlockHeader,
+  createSkeleton,
+  formatValueIndicator,
+} from './teletext.js';
+
+describe('Block Character Utilities (Req 32.3, 32.5, 32.6)', () => {
+  describe('BLOCK_CHARS constant', () => {
+    it('should have all required block characters', () => {
+      expect(BLOCK_CHARS.FULL).toBe('█');
+      expect(BLOCK_CHARS.UPPER_HALF).toBe('▀');
+      expect(BLOCK_CHARS.LOWER_HALF).toBe('▄');
+      expect(BLOCK_CHARS.LEFT_HALF).toBe('▌');
+      expect(BLOCK_CHARS.RIGHT_HALF).toBe('▐');
+      expect(BLOCK_CHARS.LIGHT_SHADE).toBe('░');
+      expect(BLOCK_CHARS.MEDIUM_SHADE).toBe('▒');
+      expect(BLOCK_CHARS.DARK_SHADE).toBe('▓');
+      expect(BLOCK_CHARS.BULLET).toBe('►');
+    });
+  });
+
+  describe('SEPARATOR_STYLES constant', () => {
+    it('should have all separator styles', () => {
+      expect(SEPARATOR_STYLES.HEAVY).toBe('━');
+      expect(SEPARATOR_STYLES.DOUBLE).toBe('═');
+      expect(SEPARATOR_STYLES.LIGHT).toBe('─');
+      expect(SEPARATOR_STYLES.BLOCK).toBe('█');
+    });
+  });
+
+  describe('createProgressBar', () => {
+    it('PROPERTY: Progress bar length equals specified width', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 0, max: 100 }),
+          fc.integer({ min: 5, max: 40 }),
+          (progress, width) => {
+            const result = createProgressBar(progress, width, false);
+            return result.length === width;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('PROPERTY: Filled blocks count matches progress percentage', () => {
+      fc.assert(
+        fc.property(
+          fc.integer({ min: 0, max: 100 }),
+          fc.integer({ min: 10, max: 40 }),
+          (progress, width) => {
+            const result = createProgressBar(progress, width, false);
+            const filledCount = (result.match(/█/g) || []).length;
+            const expectedFilled = Math.round((progress / 100) * width);
+            return filledCount === expectedFilled;
+          }
+        ),
+        { numRuns: 100 }
+      );
+    });
+
+    it('should create progress bar at 0%', () => {
+      const result = createProgressBar(0, 10);
+      expect(result).toBe('░░░░░░░░░░');
+    });
+
+    it('should create progress bar at 50%', () => {
+      const result = createProgressBar(50, 10);
+      expect(result).toBe('█████░░░░░');
+    });
+
+    it('should create progress bar at 100%', () => {
+      const result = createProgressBar(100, 10);
+      expect(result).toBe('██████████');
+    });
+
+    it('should show percentage when requested', () => {
+      const result = createProgressBar(75, 10, true);
+      expect(result).toContain('75%');
+    });
+
+    it('should clamp progress to 0-100 range', () => {
+      expect(createProgressBar(-10, 10)).toBe('░░░░░░░░░░');
+      expect(createProgressBar(150, 10)).toBe('██████████');
+    });
+  });
+
+  describe('createBulletPoint', () => {
+    it('should create bullet point with default bullet', () => {
+      const result = createBulletPoint('Item');
+      expect(result).toBe('► Item');
+    });
+
+    it('should create bullet point with custom bullet', () => {
+      const result = createBulletPoint('Item', '•');
+      expect(result).toBe('• Item');
+    });
+
+    it('should handle null and undefined', () => {
+      expect(createBulletPoint(null)).toBe('► ');
+      expect(createBulletPoint(undefined)).toBe('► ');
+    });
+  });
+
+  describe('createBulletList', () => {
+    it('should create list of bullet points', () => {
+      const result = createBulletList(['One', 'Two', 'Three']);
+      expect(result).toEqual(['► One', '► Two', '► Three']);
+    });
+
+    it('should handle empty array', () => {
+      expect(createBulletList([])).toEqual([]);
+    });
+
+    it('should handle non-array input', () => {
+      expect(createBulletList(null)).toEqual([]);
+      expect(createBulletList('string')).toEqual([]);
+    });
+  });
+
+  describe('createBlockBorder', () => {
+    it('should create single-style border', () => {
+      const result = createBlockBorder('TEST', 'single');
+      expect(result).toHaveLength(3);
+      expect(result[0]).toContain('━');
+      expect(result[1]).toContain('TEST');
+    });
+
+    it('should create block-style border', () => {
+      const result = createBlockBorder('TEST', 'block');
+      expect(result).toHaveLength(3);
+      expect(result[0]).toContain('█');
+    });
+
+    it('should handle null and undefined', () => {
+      const result = createBlockBorder(null);
+      expect(result).toHaveLength(3);
+    });
+  });
+
+  describe('createBlockHeader', () => {
+    it('should create underline-style header', () => {
+      const result = createBlockHeader('TITLE', 'underline');
+      expect(result).toHaveLength(2);
+      expect(result[0]).toBe('TITLE');
+      expect(result[1]).toContain('═');
+    });
+
+    it('should create box-style header', () => {
+      const result = createBlockHeader('TITLE', 'box');
+      expect(result).toHaveLength(3);
+    });
+
+    it('should uppercase the text', () => {
+      const result = createBlockHeader('title');
+      expect(result[0]).toBe('TITLE');
+    });
+  });
+
+  describe('createSkeleton', () => {
+    it('should create skeleton lines', () => {
+      const result = createSkeleton(10, 3);
+      expect(result).toHaveLength(3);
+      expect(result[0]).toBe('░░░░░░░░░░');
+    });
+
+    it('should use default values', () => {
+      const result = createSkeleton();
+      expect(result).toHaveLength(1);
+      expect(result[0].length).toBe(20);
+    });
+  });
+
+  describe('formatValueIndicator', () => {
+    it('should format positive values with arrow', () => {
+      const result = formatValueIndicator(10, 'arrow');
+      expect(result).toContain('↑');
+      expect(result).toContain('+10');
+    });
+
+    it('should format negative values with arrow', () => {
+      const result = formatValueIndicator(-5, 'arrow');
+      expect(result).toContain('↓');
+      expect(result).toContain('-5');
+    });
+
+    it('should format with block style', () => {
+      const result = formatValueIndicator(10, 'block');
+      expect(result).toContain('▀');
+    });
+
+    it('should handle zero as positive', () => {
+      const result = formatValueIndicator(0, 'arrow');
+      expect(result).toContain('+');
+    });
+  });
+});

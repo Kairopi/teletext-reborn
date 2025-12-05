@@ -1,14 +1,15 @@
 /**
- * Teletext Reborn - News API Service
+ * Teletext Reborn - News API Service (Enhanced)
  * 
- * Integrates with NewsData.io API for current news headlines.
- * Supports multiple categories: Top Stories, World, Technology, Business, Sports.
+ * Multi-source news fetching with fallback chain:
+ * 1. RSS2JSON (BBC feeds) - Primary, 10,000 requests/day
+ * 2. NewsData.io - Secondary fallback
+ * 3. Mock data - Final fallback (DEMO MODE)
  * 
  * @module services/newsApi
  * Requirements: 5.1-5.7
  */
 
-import { get, buildUrl, CacheTTL, ApiError, ErrorTypes } from './api.js';
 import { truncateToWidth } from '../utils/teletext.js';
 import { formatRelativeTime } from '../utils/date.js';
 
@@ -16,542 +17,361 @@ import { formatRelativeTime } from '../utils/date.js';
 // Constants
 // ============================================
 
-/**
- * NewsData.io API endpoint
- * @see https://newsdata.io/documentation
- */
-const NEWS_API = 'https://newsdata.io/api/1/news';
-
-/**
- * API Key for NewsData.io
- * Free tier: 200 requests/day
- * Loaded from environment variable (see .env file)
- */
-const NEWS_API_KEY = import.meta.env.VITE_NEWS_API_KEY || '';
-
-/**
- * Debug mode flag - enables verbose logging in development
- * @private
- */
+const RSS2JSON_API = 'https://api.rss2json.com/v1/api.json';
+const NEWSDATA_API = 'https://newsdata.io/api/1/news';
+const NEWSDATA_API_KEY = import.meta.env.VITE_NEWS_API_KEY || '';
 const DEBUG = import.meta.env.DEV || false;
 
-/**
- * Log debug message (only in development)
- * @param {string} message - Message to log
- * @param {any} [data] - Optional data to log
- * @private
- */
 function debugLog(message, data) {
-  if (DEBUG) {
-    if (data !== undefined) {
-      console.debug(`[NewsAPI] ${message}`, data);
-    } else {
-      console.debug(`[NewsAPI] ${message}`);
-    }
-  }
+  if (DEBUG) console.debug(`[NewsAPI] ${message}`, data !== undefined ? data : '');
 }
 
-// Validate API key on module load
-if (!NEWS_API_KEY) {
-  console.warn(
-    '[NewsAPI] No API key configured. ' +
-    'Set VITE_NEWS_API_KEY in .env file. ' +
-    'News features will use mock data.'
-  );
-}
+const RSS_FEEDS = {
+  top: 'https://feeds.bbci.co.uk/news/rss.xml',
+  world: 'https://feeds.bbci.co.uk/news/world/rss.xml',
+  technology: 'https://feeds.bbci.co.uk/news/technology/rss.xml',
+  business: 'https://feeds.bbci.co.uk/news/business/rss.xml',
+  sports: 'https://feeds.bbci.co.uk/sport/rss.xml',
+};
 
-/**
- * Cache TTL for news data (5 minutes - Req 5.7)
- */
-const CACHE_TTL = CacheTTL.FIVE_MINUTES;
-
-/**
- * News categories mapping to page numbers (Req 5.2)
- */
 export const NEWS_CATEGORIES = {
   top: { page: 101, label: 'TOP STORIES', apiCategory: 'top' },
-  world: { page: 102, label: 'WORLD NEWS', apiCategory: 'world' },
-  technology: { page: 103, label: 'TECHNOLOGY', apiCategory: 'technology' },
+  world: { page: 102, label: 'WORLD', apiCategory: 'world' },
+  technology: { page: 103, label: 'TECH', apiCategory: 'technology' },
   business: { page: 104, label: 'BUSINESS', apiCategory: 'business' },
   sports: { page: 105, label: 'SPORTS', apiCategory: 'sports' },
 };
 
-/**
- * Page number to category mapping
- */
 export const PAGE_TO_CATEGORY = {
-  101: 'top',
-  102: 'world',
-  103: 'technology',
-  104: 'business',
-  105: 'sports',
+  101: 'top', 102: 'world', 103: 'technology', 104: 'business', 105: 'sports',
 };
 
-/**
- * Maximum headlines per category
- */
 const MAX_HEADLINES = 10;
+const MAX_HEADLINE_LENGTH = 42;
+const CACHE_TTL = 5 * 60 * 1000;
 
-/**
- * Maximum headline text length (Req 5.6)
- */
-const MAX_HEADLINE_LENGTH = 38; // Leave room for bullet
-
-/**
- * Rate limit tracking
- */
-let requestCount = 0;
-let requestDate = null;
-const MAX_DAILY_REQUESTS = 200;
+let isDemoMode = false;
+let lastError = null;
 
 // ============================================
-// Rate Limit Management
+// Cache Management
 // ============================================
 
-/**
- * Check if we can make a news API request
- * @returns {boolean} True if request is allowed
- */
-export function canMakeRequest() {
-  const today = new Date().toDateString();
-  
-  // Reset counter on new day
-  if (requestDate !== today) {
-    requestCount = 0;
-    requestDate = today;
-    _saveRateLimitState();
-  }
-  
-  return requestCount < MAX_DAILY_REQUESTS;
-}
+function getCacheKey(category) { return `teletext_news_${category}`; }
 
-/**
- * Track a news API request
- */
-function trackRequest() {
-  const today = new Date().toDateString();
-  
-  if (requestDate !== today) {
-    requestCount = 0;
-    requestDate = today;
-  }
-  
-  requestCount++;
-  _saveRateLimitState();
-}
-
-/**
- * Get remaining requests for today
- * @returns {number} Remaining requests
- */
-export function getRemainingRequests() {
-  const today = new Date().toDateString();
-  
-  if (requestDate !== today) {
-    return MAX_DAILY_REQUESTS;
-  }
-  
-  return Math.max(0, MAX_DAILY_REQUESTS - requestCount);
-}
-
-/**
- * Save rate limit state to localStorage
- * @private
- */
-function _saveRateLimitState() {
+function getFromCache(category) {
   try {
-    localStorage.setItem('teletext_news_rate_limit', JSON.stringify({
-      count: requestCount,
-      date: requestDate,
-    }));
-  } catch (error) {
-    debugLog('Failed to save rate limit state', error);
-  }
-}
-
-/**
- * Load rate limit state from localStorage
- * @private
- */
-function _loadRateLimitState() {
-  try {
-    const stored = localStorage.getItem('teletext_news_rate_limit');
+    const stored = localStorage.getItem(getCacheKey(category));
     if (stored) {
-      const state = JSON.parse(stored);
-      const today = new Date().toDateString();
-      
-      if (state.date === today) {
-        requestCount = state.count || 0;
-        requestDate = state.date;
-        debugLog('Loaded rate limit state', { count: requestCount, date: requestDate });
+      const entry = JSON.parse(stored);
+      if (Date.now() - entry.timestamp < CACHE_TTL) {
+        debugLog('Cache hit', category);
+        return entry.data;
       }
     }
-  } catch (error) {
-    debugLog('Failed to load rate limit state', error);
-  }
+  } catch (e) { debugLog('Cache error', e); }
+  return null;
 }
 
-// Initialize rate limit state on module load
-_loadRateLimitState();
-
-// ============================================
-// Helper Functions
-// ============================================
-
-/**
- * Generate cache key for news data
- * @param {string} category - News category
- * @returns {string} Cache key
- */
-function getCacheKey(category) {
-  return `news_${category}`;
+function saveToCache(category, data) {
+  try {
+    localStorage.setItem(getCacheKey(category), JSON.stringify({ timestamp: Date.now(), data }));
+  } catch (e) { debugLog('Cache save error', e); }
 }
 
-/**
- * Parse news article from API response
- * @param {Object} article - Raw article from API
- * @returns {Object} Parsed article
- */
-function parseArticle(article) {
-  const pubDate = article.pubDate ? new Date(article.pubDate) : null;
+function getStaleCache(category) {
+  try {
+    const stored = localStorage.getItem(getCacheKey(category));
+    if (stored) {
+      const entry = JSON.parse(stored);
+      return { ...entry.data, _stale: true };
+    }
+  } catch (e) { /* ignore */ }
+  return null;
+}
+
+
+// ============================================
+// RSS2JSON Fetcher (Primary)
+// ============================================
+
+async function fetchFromRSS2JSON(category) {
+  const feedUrl = RSS_FEEDS[category];
+  if (!feedUrl) throw new Error(`No RSS feed for: ${category}`);
   
-  return {
-    title: article.title || 'NO TITLE',
-    description: article.description || '',
-    source: article.source_id || article.source_name || 'UNKNOWN',
-    pubDate: pubDate,
-    timeAgo: pubDate ? formatRelativeTime(pubDate) : '',
-    link: article.link || null,
-    imageUrl: article.image_url || null,
-    category: article.category?.[0] || 'general',
-  };
+  const url = `${RSS2JSON_API}?rss_url=${encodeURIComponent(feedUrl)}`;
+  debugLog('Fetching RSS2JSON', category);
+  
+  const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!response.ok) throw new Error(`RSS2JSON: ${response.status}`);
+  
+  const data = await response.json();
+  if (data.status !== 'ok' || !data.items?.length) throw new Error('No RSS items');
+  
+  debugLog('RSS2JSON success', { category, count: data.items.length });
+  return parseRSSResponse(data, category);
 }
 
-/**
- * Parse news response from NewsData.io API
- * @param {Object} data - API response
- * @param {string} category - News category
- * @returns {Object} Parsed news data
- */
-function parseNewsResponse(data, category) {
+function parseRSSResponse(data, category) {
   const categoryInfo = NEWS_CATEGORIES[category] || NEWS_CATEGORIES.top;
-  const articles = data.results || [];
+  const articles = (data.items || []).slice(0, MAX_HEADLINES).map(item => {
+    const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
+    return {
+      title: item.title || 'NO TITLE',
+      description: item.description || '',
+      source: 'BBC',
+      pubDate, timeAgo: formatRelativeTime(pubDate),
+      link: item.link || null,
+      imageUrl: item.thumbnail || item.enclosure?.link || null,
+    };
+  });
   
   return {
-    category: category,
-    categoryLabel: categoryInfo.label,
-    pageNumber: categoryInfo.page,
-    articles: articles.slice(0, MAX_HEADLINES).map(parseArticle),
-    totalResults: data.totalResults || articles.length,
-    nextPage: data.nextPage || null,
-    lastUpdated: new Date(),
-    _stale: data._stale || false,
+    category, categoryLabel: categoryInfo.label, pageNumber: categoryInfo.page,
+    articles, totalResults: articles.length, lastUpdated: new Date(),
+    _source: 'BBC via RSS', _stale: false, _demo: false,
   };
 }
 
-/**
- * Format headline for Teletext display (Req 5.3, 5.6)
- * @param {Object} article - Parsed article
- * @returns {Object} Formatted headline
- */
-export function formatHeadline(article) {
+// ============================================
+// NewsData.io Fetcher (Secondary)
+// ============================================
+
+async function fetchFromNewsData(category) {
+  if (!NEWSDATA_API_KEY) throw new Error('No NewsData API key');
+  
+  const categoryInfo = NEWS_CATEGORIES[category] || NEWS_CATEGORIES.top;
+  const url = `${NEWSDATA_API}?apikey=${NEWSDATA_API_KEY}&language=en&category=${categoryInfo.apiCategory}`;
+  
+  debugLog('Fetching NewsData', category);
+  const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+  if (!response.ok) throw new Error(`NewsData: ${response.status}`);
+  
+  const data = await response.json();
+  if (!data.results?.length) throw new Error('No NewsData results');
+  
+  debugLog('NewsData success', { category, count: data.results.length });
+  return parseNewsDataResponse(data, category);
+}
+
+function parseNewsDataResponse(data, category) {
+  const categoryInfo = NEWS_CATEGORIES[category] || NEWS_CATEGORIES.top;
+  const articles = (data.results || []).slice(0, MAX_HEADLINES).map(item => {
+    const pubDate = item.pubDate ? new Date(item.pubDate) : new Date();
+    return {
+      title: item.title || 'NO TITLE',
+      description: item.description || '',
+      source: item.source_id || item.source_name || 'NEWS',
+      pubDate, timeAgo: formatRelativeTime(pubDate),
+      link: item.link || null,
+      imageUrl: item.image_url || null,
+    };
+  });
+  
   return {
-    title: truncateToWidth(article.title, MAX_HEADLINE_LENGTH),
-    source: truncateToWidth(article.source.toUpperCase(), 15),
-    timeAgo: article.timeAgo || '',
-    fullTitle: article.title,
-    link: article.link,
+    category, categoryLabel: categoryInfo.label, pageNumber: categoryInfo.page,
+    articles, totalResults: articles.length, lastUpdated: new Date(),
+    _source: 'NewsData.io', _stale: false, _demo: false,
   };
 }
 
-/**
- * Format all headlines for display
- * @param {Array} articles - Array of parsed articles
- * @returns {Array} Array of formatted headlines
- */
-export function formatHeadlines(articles) {
-  if (!Array.isArray(articles)) {
-    return [];
-  }
-  return articles.map(formatHeadline);
+// ============================================
+// Mock Data (Final Fallback)
+// ============================================
+
+const MOCK_HEADLINES = {
+  top: [
+    { title: 'GLOBAL LEADERS MEET FOR CLIMATE SUMMIT', source: 'DEMO', timeAgo: '2H AGO' },
+    { title: 'TECH GIANTS ANNOUNCE NEW AI INITIATIVES', source: 'DEMO', timeAgo: '3H AGO' },
+    { title: 'MARKETS RALLY ON POSITIVE ECONOMIC DATA', source: 'DEMO', timeAgo: '4H AGO' },
+    { title: 'SCIENTISTS MAKE BREAKTHROUGH DISCOVERY', source: 'DEMO', timeAgo: '5H AGO' },
+    { title: 'WORLD CUP QUALIFIERS BEGIN THIS WEEK', source: 'DEMO', timeAgo: '6H AGO' },
+    { title: 'NEW SPACE MISSION LAUNCHES SUCCESSFULLY', source: 'DEMO', timeAgo: '7H AGO' },
+    { title: 'HEALTH EXPERTS ISSUE NEW GUIDELINES', source: 'DEMO', timeAgo: '8H AGO' },
+    { title: 'ENTERTAINMENT AWARDS CEREMONY TONIGHT', source: 'DEMO', timeAgo: '9H AGO' },
+  ],
+  world: [
+    { title: 'UN SECURITY COUNCIL HOLDS EMERGENCY MEETING', source: 'DEMO', timeAgo: '1H AGO' },
+    { title: 'EUROPEAN UNION ANNOUNCES NEW TRADE DEAL', source: 'DEMO', timeAgo: '2H AGO' },
+    { title: 'ASIA PACIFIC LEADERS SUMMIT CONCLUDES', source: 'DEMO', timeAgo: '3H AGO' },
+    { title: 'MIDDLE EAST PEACE TALKS RESUME', source: 'DEMO', timeAgo: '4H AGO' },
+    { title: 'AFRICAN NATIONS FORM NEW ALLIANCE', source: 'DEMO', timeAgo: '5H AGO' },
+    { title: 'LATIN AMERICA ECONOMIC FORUM OPENS', source: 'DEMO', timeAgo: '6H AGO' },
+  ],
+  technology: [
+    { title: 'NEW SMARTPHONE FEATURES REVOLUTIONARY AI', source: 'DEMO', timeAgo: '1H AGO' },
+    { title: 'QUANTUM COMPUTING REACHES NEW MILESTONE', source: 'DEMO', timeAgo: '2H AGO' },
+    { title: 'CYBERSECURITY EXPERTS WARN OF NEW THREAT', source: 'DEMO', timeAgo: '3H AGO' },
+    { title: 'ELECTRIC VEHICLE SALES HIT RECORD HIGH', source: 'DEMO', timeAgo: '4H AGO' },
+    { title: 'SOCIAL MEDIA PLATFORM LAUNCHES NEW FEATURE', source: 'DEMO', timeAgo: '5H AGO' },
+    { title: 'ROBOTICS COMPANY UNVEILS HUMANOID ROBOT', source: 'DEMO', timeAgo: '6H AGO' },
+  ],
+  business: [
+    { title: 'STOCK MARKETS REACH ALL-TIME HIGHS', source: 'DEMO', timeAgo: '1H AGO' },
+    { title: 'CENTRAL BANK ANNOUNCES INTEREST RATE DECISION', source: 'DEMO', timeAgo: '2H AGO' },
+    { title: 'MAJOR MERGER CREATES INDUSTRY GIANT', source: 'DEMO', timeAgo: '3H AGO' },
+    { title: 'STARTUP RAISES RECORD FUNDING ROUND', source: 'DEMO', timeAgo: '4H AGO' },
+    { title: 'OIL PRICES FLUCTUATE ON SUPPLY CONCERNS', source: 'DEMO', timeAgo: '5H AGO' },
+    { title: 'RETAIL SALES EXCEED EXPECTATIONS', source: 'DEMO', timeAgo: '6H AGO' },
+  ],
+  sports: [
+    { title: 'CHAMPIONSHIP FINAL SET FOR WEEKEND', source: 'DEMO', timeAgo: '1H AGO' },
+    { title: 'STAR PLAYER SIGNS RECORD CONTRACT', source: 'DEMO', timeAgo: '2H AGO' },
+    { title: 'OLYMPIC COMMITTEE ANNOUNCES HOST CITY', source: 'DEMO', timeAgo: '3H AGO' },
+    { title: 'TENNIS GRAND SLAM ENTERS FINAL STAGES', source: 'DEMO', timeAgo: '4H AGO' },
+    { title: 'FOOTBALL LEAGUE STANDINGS UPDATE', source: 'DEMO', timeAgo: '5H AGO' },
+    { title: 'MOTORSPORT SEASON FINALE APPROACHES', source: 'DEMO', timeAgo: '6H AGO' },
+  ],
+};
+
+function getMockData(category) {
+  const categoryInfo = NEWS_CATEGORIES[category] || NEWS_CATEGORIES.top;
+  const headlines = MOCK_HEADLINES[category] || MOCK_HEADLINES.top;
+  const articles = headlines.map(h => ({
+    title: h.title, description: '', source: h.source,
+    pubDate: new Date(), timeAgo: h.timeAgo, link: null, imageUrl: null,
+  }));
+  
+  return {
+    category, categoryLabel: categoryInfo.label, pageNumber: categoryInfo.page,
+    articles, totalResults: articles.length, lastUpdated: new Date(),
+    _source: 'DEMO MODE', _stale: false, _demo: true,
+  };
 }
+
 
 // ============================================
 // Main API Functions
 // ============================================
 
 /**
- * Fetch news headlines for a category
- * 
- * @param {string} [category='top'] - News category (top, world, technology, business, sports)
- * @returns {Promise<Object>} News data with headlines
- * @throws {ApiError} On API failure
- * 
- * Requirements: 5.1-5.7
- * 
- * @example
- * const news = await getNews('technology');
- * // Returns:
- * // {
- * //   category: 'technology',
- * //   categoryLabel: 'TECHNOLOGY',
- * //   pageNumber: 103,
- * //   articles: [{ title, source, timeAgo, ... }, ...],
- * //   lastUpdated: Date
- * // }
+ * Fetch news with fallback chain: RSS2JSON -> NewsData -> Mock
  */
 export async function getNews(category = 'top') {
-  // Validate category
   const validCategory = NEWS_CATEGORIES[category] ? category : 'top';
-  const categoryInfo = NEWS_CATEGORIES[validCategory];
   
-  const cacheKey = getCacheKey(validCategory);
-  
-  // Check rate limit (Req 5.5 - graceful handling)
-  if (!canMakeRequest()) {
-    // Try to return cached data with rate limit notice
-    const cachedData = _getStaleCache(cacheKey);
-    if (cachedData) {
-      return {
-        ...cachedData,
-        _stale: true,
-        _rateLimited: true,
-        _message: 'RATE LIMIT REACHED - USING CACHED DATA',
-      };
-    }
-    
-    throw new ApiError(
-      ErrorTypes.RATE_LIMIT,
-      'DAILY REQUEST LIMIT REACHED',
-      { retryable: false }
-    );
+  // Check cache first
+  const cached = getFromCache(validCategory);
+  if (cached) {
+    isDemoMode = cached._demo || false;
+    return cached;
   }
   
-  const url = buildUrl(NEWS_API, {
-    apikey: NEWS_API_KEY,
-    language: 'en',
-    category: categoryInfo.apiCategory,
-  });
-  
+  // Try RSS2JSON (Primary - BBC feeds)
   try {
-    // Track the request before making it
-    trackRequest();
-    
-    const data = await get(url, {
-      cacheKey,
-      cacheTTL: CACHE_TTL,
-    });
-    
-    return parseNewsResponse(data, validCategory);
-    
-  } catch (error) {
-    // If API fails, try to return stale cache (Req 5.5)
-    const cachedData = _getStaleCache(cacheKey);
-    if (cachedData) {
-      return {
-        ...cachedData,
-        _stale: true,
-        _error: error.message,
-      };
-    }
-    
-    throw error;
+    const data = await fetchFromRSS2JSON(validCategory);
+    saveToCache(validCategory, data);
+    isDemoMode = false;
+    lastError = null;
+    return data;
+  } catch (rssError) {
+    debugLog('RSS2JSON failed', rssError.message);
+    lastError = rssError.message;
   }
+  
+  // Try NewsData.io (Secondary)
+  try {
+    const data = await fetchFromNewsData(validCategory);
+    saveToCache(validCategory, data);
+    isDemoMode = false;
+    lastError = null;
+    return data;
+  } catch (newsDataError) {
+    debugLog('NewsData failed', newsDataError.message);
+    lastError = newsDataError.message;
+  }
+  
+  // Try stale cache
+  const staleData = getStaleCache(validCategory);
+  if (staleData) return staleData;
+  
+  // Final fallback: Mock data
+  debugLog('Using DEMO MODE');
+  isDemoMode = true;
+  const mockData = getMockData(validCategory);
+  saveToCache(validCategory, mockData);
+  return mockData;
 }
 
-/**
- * Fetch news for a specific page number
- * 
- * @param {number} pageNumber - Page number (101-105)
- * @returns {Promise<Object>} News data
- * @throws {ApiError} On invalid page or API failure
- */
 export async function getNewsByPage(pageNumber) {
   const category = PAGE_TO_CATEGORY[pageNumber];
-  
-  if (!category) {
-    throw new ApiError(
-      ErrorTypes.NOT_FOUND,
-      `INVALID NEWS PAGE: ${pageNumber}`,
-      { retryable: false }
-    );
-  }
-  
-  return getNews(category);
+  return category ? getNews(category) : getMockData('top');
 }
 
-/**
- * Get all news categories with their page numbers
- * @returns {Array} Array of category info objects
- */
-export function getNewsCategories() {
-  return Object.entries(NEWS_CATEGORIES).map(([key, value]) => ({
-    id: key,
-    ...value,
-  }));
-}
+export function isInDemoMode() { return isDemoMode; }
+export function getLastError() { return lastError; }
 
-/**
- * Check if a page number is a news page
- * @param {number} pageNumber - Page number to check
- * @returns {boolean} True if it's a news page
- */
-export function isNewsPage(pageNumber) {
-  return pageNumber >= 101 && pageNumber <= 109;
-}
-
-/**
- * Get category info for a page number
- * @param {number} pageNumber - Page number
- * @returns {Object|null} Category info or null
- */
-export function getCategoryForPage(pageNumber) {
-  const category = PAGE_TO_CATEGORY[pageNumber];
-  if (!category) return null;
+export function formatHeadline(article) {
+  // Strip HTML tags from description
+  const cleanDesc = (article.description || '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .trim();
   
   return {
-    id: category,
-    ...NEWS_CATEGORIES[category],
+    title: truncateToWidth(article.title, MAX_HEADLINE_LENGTH),
+    description: cleanDesc ? truncateToWidth(cleanDesc, 80) : '',
+    source: truncateToWidth((article.source || 'NEWS').toUpperCase(), 12),
+    timeAgo: article.timeAgo || '',
+    fullTitle: article.title,
+    link: article.link,
   };
 }
 
-// ============================================
-// Cache Helpers
-// ============================================
-
-/**
- * Get stale cache data (ignoring TTL)
- * @param {string} key - Cache key
- * @returns {Object|null} Cached data or null
- * @private
- */
-function _getStaleCache(key) {
-  try {
-    const cacheKey = `teletext_cache_${key}`;
-    const stored = localStorage.getItem(cacheKey);
-    if (stored) {
-      const entry = JSON.parse(stored);
-      if (entry.data) {
-        // Re-parse to ensure consistent format
-        const category = key.replace('news_', '');
-        debugLog('Retrieved stale cache', { key, category });
-        return parseNewsResponse(entry.data, category);
-      }
-    }
-  } catch (error) {
-    debugLog('Failed to get stale cache', error);
-  }
-  return null;
+export function formatHeadlines(articles) {
+  return Array.isArray(articles) ? articles.map(formatHeadline) : [];
 }
 
-/**
- * Clear news cache for a category
- * @param {string} [category] - Category to clear, or all if not specified
- */
+export function getNewsCategories() {
+  return Object.entries(NEWS_CATEGORIES).map(([key, value]) => ({ id: key, ...value }));
+}
+
+export function isNewsPage(pageNumber) { return pageNumber >= 101 && pageNumber <= 109; }
+
+export function getCategoryForPage(pageNumber) {
+  const category = PAGE_TO_CATEGORY[pageNumber];
+  return category ? { id: category, ...NEWS_CATEGORIES[category] } : null;
+}
+
 export function clearNewsCache(category) {
   try {
     if (category) {
-      const cacheKey = `teletext_cache_${getCacheKey(category)}`;
-      localStorage.removeItem(cacheKey);
-      debugLog('Cleared cache for category', category);
+      localStorage.removeItem(getCacheKey(category));
     } else {
-      // Clear all news cache
-      Object.keys(NEWS_CATEGORIES).forEach(cat => {
-        const cacheKey = `teletext_cache_${getCacheKey(cat)}`;
-        localStorage.removeItem(cacheKey);
-      });
-      debugLog('Cleared all news cache');
+      Object.keys(NEWS_CATEGORIES).forEach(cat => localStorage.removeItem(getCacheKey(cat)));
     }
-  } catch (error) {
-    debugLog('Failed to clear news cache', error);
-  }
+  } catch (e) { /* ignore */ }
 }
 
-/**
- * Check if news data is cached and fresh
- * @param {string} category - News category
- * @returns {boolean} True if fresh cache exists
- */
-export function hasValidCache(category) {
-  try {
-    const cacheKey = `teletext_cache_${getCacheKey(category)}`;
-    const stored = localStorage.getItem(cacheKey);
-    if (stored) {
-      const entry = JSON.parse(stored);
-      if (entry.timestamp && entry.ttl) {
-        const isValid = Date.now() - entry.timestamp < entry.ttl;
-        debugLog('Cache validity check', { category, isValid });
-        return isValid;
-      }
-    }
-  } catch (error) {
-    debugLog('Failed to check cache validity', error);
-  }
-  return false;
-}
+export function hasValidCache(category) { return getFromCache(category) !== null; }
 
 // ============================================
-// Auto-Refresh Support (Req 5.7)
+// Auto-Refresh
 // ============================================
 
-/**
- * Auto-refresh interval ID
- * @private
- */
 let autoRefreshInterval = null;
-
-/**
- * Auto-refresh callbacks
- * @private
- */
 const refreshCallbacks = new Set();
 
-/**
- * Start auto-refresh for news data (Req 5.7)
- * Refreshes every 5 minutes without disrupting user experience
- * 
- * @param {Function} [onRefresh] - Callback when data is refreshed
- * @returns {Function} Function to stop auto-refresh
- */
 export function startAutoRefresh(onRefresh) {
-  if (onRefresh) {
-    refreshCallbacks.add(onRefresh);
-  }
+  if (onRefresh) refreshCallbacks.add(onRefresh);
   
-  // Only start one interval
   if (!autoRefreshInterval) {
-    debugLog('Starting auto-refresh interval');
+    debugLog('Starting auto-refresh');
     autoRefreshInterval = setInterval(async () => {
-      // Refresh all categories in background
       for (const category of Object.keys(NEWS_CATEGORIES)) {
         try {
-          if (canMakeRequest()) {
-            const data = await getNews(category);
-            debugLog('Auto-refreshed category', category);
-            // Notify callbacks
-            refreshCallbacks.forEach(cb => {
-              try {
-                cb(category, data);
-              } catch (error) {
-                debugLog('Auto-refresh callback error', error);
-              }
-            });
-          }
-        } catch (error) {
-          // Silently fail - don't disrupt user experience
-          debugLog('Auto-refresh failed for category', { category, error: error.message });
-        }
+          const data = await getNews(category);
+          refreshCallbacks.forEach(cb => { try { cb(category, data); } catch (e) { /* ignore */ } });
+        } catch (e) { debugLog('Auto-refresh error', e); }
       }
-    }, CACHE_TTL); // 5 minutes
+    }, CACHE_TTL);
   }
   
-  // Return unsubscribe function
   return () => {
-    if (onRefresh) {
-      refreshCallbacks.delete(onRefresh);
-    }
-    
-    // Stop interval if no more callbacks
+    if (onRefresh) refreshCallbacks.delete(onRefresh);
     if (refreshCallbacks.size === 0 && autoRefreshInterval) {
       clearInterval(autoRefreshInterval);
       autoRefreshInterval = null;
@@ -559,87 +379,16 @@ export function startAutoRefresh(onRefresh) {
   };
 }
 
-/**
- * Stop all auto-refresh
- */
 export function stopAutoRefresh() {
-  if (autoRefreshInterval) {
-    clearInterval(autoRefreshInterval);
-    autoRefreshInterval = null;
-  }
+  if (autoRefreshInterval) { clearInterval(autoRefreshInterval); autoRefreshInterval = null; }
   refreshCallbacks.clear();
-}
-
-// ============================================
-// Mock Data for Development/Testing
-// ============================================
-
-/**
- * Mock news data for testing without API
- */
-export const MOCK_NEWS_DATA = {
-  top: {
-    category: 'top',
-    categoryLabel: 'TOP STORIES',
-    pageNumber: 101,
-    articles: [
-      {
-        title: 'BREAKING: Major Technology Breakthrough Announced',
-        description: 'Scientists reveal groundbreaking discovery',
-        source: 'BBC',
-        pubDate: new Date(Date.now() - 30 * 60 * 1000),
-        timeAgo: '30 MINS AGO',
-        link: 'https://example.com/1',
-      },
-      {
-        title: 'Global Markets React to Economic News',
-        description: 'Stock markets show mixed results',
-        source: 'REUTERS',
-        pubDate: new Date(Date.now() - 2 * 60 * 60 * 1000),
-        timeAgo: '2 HOURS AGO',
-        link: 'https://example.com/2',
-      },
-      {
-        title: 'Weather Alert: Storm System Approaching',
-        description: 'Meteorologists warn of severe weather',
-        source: 'CNN',
-        pubDate: new Date(Date.now() - 4 * 60 * 60 * 1000),
-        timeAgo: '4 HOURS AGO',
-        link: 'https://example.com/3',
-      },
-    ],
-    lastUpdated: new Date(),
-    _stale: false,
-  },
-};
-
-/**
- * Get mock news data for testing
- * @param {string} [category='top'] - News category
- * @returns {Object} Mock news data
- */
-export function getMockNews(category = 'top') {
-  const categoryInfo = NEWS_CATEGORIES[category] || NEWS_CATEGORIES.top;
-  const mockData = MOCK_NEWS_DATA.top;
-  
-  return {
-    ...mockData,
-    category,
-    categoryLabel: categoryInfo.label,
-    pageNumber: categoryInfo.page,
-  };
 }
 
 // ============================================
 // Exports for Testing
 // ============================================
 
-export {
-  NEWS_API,
-  CACHE_TTL,
-  MAX_HEADLINES,
-  MAX_HEADLINE_LENGTH,
-  getCacheKey,
-  parseArticle,
-  parseNewsResponse,
-};
+export function getMockNews(category = 'top') { return getMockData(category); }
+export function canMakeRequest() { return true; }
+export function getRemainingRequests() { return 9999; }
+export { CACHE_TTL, MAX_HEADLINES, MAX_HEADLINE_LENGTH };

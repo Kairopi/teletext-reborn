@@ -24,6 +24,12 @@ import * as financePage from './pages/finance.js';
 import * as timeMachinePage from './pages/timeMachineEnhanced.js';
 import * as settingsPage from './pages/settings.js';
 import * as aboutPage from './pages/about.js';
+// Easter Egg pages
+import * as easterEggPage from './pages/easterEgg.js';
+import * as notFoundPage from './pages/notFound.js';
+// Easter Eggs system
+import { initKonamiCode, destroyKonamiCode } from './utils/easterEggs.js';
+import { initKeyboardShortcutsOverlay, destroyKeyboardShortcutsOverlay } from './utils/keyboardShortcuts.js';
 
 /**
  * Page registry - maps page numbers to page modules
@@ -43,10 +49,16 @@ const PAGE_REGISTRY = {
   // Enhanced Time Machine pages
   503: timeMachinePage,  // Event Detail page
   504: timeMachinePage,  // Timeline view
+  // Easter Egg and 404 pages - use literal numbers to ensure they work
+  888: easterEggPage,  // Page 888 Easter Egg
+  404: notFoundPage,   // Page 404 Not Found
   // Settings and About
   [PAGE_NUMBERS.SETTINGS]: settingsPage,
   [PAGE_NUMBERS.ABOUT]: aboutPage,
 };
+
+console.log('[PAGE_REGISTRY] Initialized with keys:', Object.keys(PAGE_REGISTRY));
+console.log('[PAGE_REGISTRY] PAGE_NUMBERS.EASTER_EGG =', PAGE_NUMBERS.EASTER_EGG);
 
 /**
  * Current mounted page module
@@ -199,6 +211,19 @@ class TeletextScreen {
     
     // Attach micro-interaction effects
     attachAllEffects(this._container);
+    
+    // Initialize router keyboard shortcuts (number keys 1-9, arrows, Escape)
+    const router = getRouter();
+    router.initKeyboardShortcuts();
+    console.log('[TeletextScreen] Router keyboard shortcuts initialized');
+    
+    // Initialize Easter eggs (Konami code detection)
+    initKonamiCode();
+    console.log('[TeletextScreen] Konami code detection initialized');
+    
+    // Initialize keyboard shortcuts overlay (? key)
+    initKeyboardShortcutsOverlay();
+    console.log('[TeletextScreen] Keyboard shortcuts overlay initialized');
     
     this._isRendered = true;
     
@@ -549,6 +574,7 @@ class TeletextScreen {
    * @private
    */
   async _onPageChange(newPage, previousPage) {
+    console.log(`[TeletextScreen] _onPageChange: ${previousPage} -> ${newPage}`);
     this._currentPage = newPage;
     
     // Update page number display (Req 0.7)
@@ -576,6 +602,9 @@ class TeletextScreen {
    * @private
    */
   async _renderPage(pageNumber) {
+    console.log(`[TeletextScreen] _renderPage called with: ${pageNumber}`);
+    console.log(`[TeletextScreen] PAGE_REGISTRY keys:`, Object.keys(PAGE_REGISTRY));
+    
     // Unmount current page if exists
     if (currentPageModule && typeof currentPageModule.onUnmount === 'function') {
       try {
@@ -587,17 +616,26 @@ class TeletextScreen {
     
     // Find the page module
     const pageModule = PAGE_REGISTRY[pageNumber];
+    console.log(`[TeletextScreen] Found pageModule for ${pageNumber}:`, pageModule ? 'YES' : 'NO');
     
     if (pageModule) {
       // Render the page content
       const contentGrid = this.getContentGrid();
+      console.log(`[TeletextScreen] contentGrid found:`, contentGrid ? 'YES' : 'NO');
+      console.log(`[TeletextScreen] pageModule.render exists:`, typeof pageModule.render === 'function');
+      
       if (contentGrid && typeof pageModule.render === 'function') {
         try {
-          contentGrid.innerHTML = pageModule.render(pageNumber);
+          const html = pageModule.render(pageNumber);
+          console.log(`[TeletextScreen] Rendered HTML length:`, html?.length || 0);
+          contentGrid.innerHTML = html;
+          console.log(`[TeletextScreen] Content updated successfully`);
         } catch (error) {
           console.error('Error rendering page:', error);
           contentGrid.innerHTML = '<div class="error-container">ERROR LOADING PAGE</div>';
         }
+      } else {
+        console.error(`[TeletextScreen] Cannot render: contentGrid=${!!contentGrid}, render=${typeof pageModule.render}`);
       }
       
       // Update Fastext buttons from page if available
@@ -895,6 +933,10 @@ class TeletextScreen {
       this._routerUnsubscribe();
       this._routerUnsubscribe = null;
     }
+    
+    // Clean up Easter eggs
+    destroyKonamiCode();
+    destroyKeyboardShortcutsOverlay();
     
     // Clear container
     if (this._container) {
