@@ -47,13 +47,13 @@ const MAX_HEADLINES_DISPLAY = 8;
  * Maximum headline title length for display
  * @constant {number}
  */
-const MAX_TITLE_LENGTH = 38;
+const MAX_TITLE_LENGTH = 42;
 
 /**
  * Maximum source name length
  * @constant {number}
  */
-const MAX_SOURCE_LENGTH = 12;
+const MAX_SOURCE_LENGTH = 14;
 
 // ============================================
 // State
@@ -129,11 +129,11 @@ function formatHeadlineHTML(headline, index) {
   const timeAgo = headline.timeAgo ? headline.timeAgo.toUpperCase() : '';
   
   return `
-    <div class="headline-item" data-index="${index}" style="margin-bottom: 6px;">
-      <div class="headline-title" style="color: var(--tt-yellow); font-size: 0.95em; line-height: 1.3;">
+    <div class="headline-item" data-index="${index}" style="margin-bottom: 4px; padding: 3px 0; border-bottom: 1px solid rgba(0,255,255,0.15);">
+      <div class="headline-title" style="color: var(--tt-yellow); line-height: 1.35;">
         ► ${title}
       </div>
-      <div class="headline-meta" style="color: var(--color-secondary-70); font-size: 0.8em;">
+      <div class="headline-meta" style="color: var(--tt-cyan); font-size: 0.85em; opacity: 0.8;">
         ${source}${timeAgo ? ` • ${timeAgo}` : ''}
       </div>
     </div>
@@ -215,14 +215,14 @@ function formatCategoryNav() {
   const tabs = categories.map(cat => {
     const isActive = cat.page === currentPageNumber;
     const style = isActive 
-      ? 'color: var(--tt-black); background: var(--tt-cyan);'
-      : 'color: var(--tt-cyan);';
+      ? 'color: var(--tt-black); background: var(--tt-cyan); padding: 2px 6px;'
+      : 'color: var(--tt-cyan); padding: 2px 6px; border: 1px solid var(--tt-cyan);';
     
-    return `<span class="category-tab" data-page="${cat.page}" style="${style} padding: 1px 4px; cursor: pointer; font-size: 0.85em;">${cat.label.split(' ')[0]}</span>`;
-  }).join(' ');
+    return `<span class="category-tab" data-page="${cat.page}" style="${style} cursor: pointer; font-size: 0.9em; margin: 0 2px;">${cat.label.split(' ')[0]}</span>`;
+  }).join('');
   
   return `
-    <div class="category-nav content-line" style="margin-bottom: 4px; text-align: center;">
+    <div class="category-nav content-line" style="margin-bottom: 6px; text-align: center; display: flex; justify-content: center; gap: 4px; flex-wrap: wrap;">
       ${tabs}
     </div>
   `;

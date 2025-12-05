@@ -117,11 +117,12 @@ function formatWeatherWidget(weather, location, unit) {
     return '';
   }
   
-  const city = location?.city || 'UNKNOWN';
+  // Get city name - prioritize location object's city, then weather cache
+  const city = location?.city || weather?.city || 'YOUR LOCATION';
   const temp = formatTemperature(weather.current.temperature, unit);
   const condition = weather.current.condition || '';
   
-  return `${city}: ${temp} ${condition}`;
+  return `☀ ${city.toUpperCase()}: ${temp} ${condition}`;
 }
 
 // ============================================

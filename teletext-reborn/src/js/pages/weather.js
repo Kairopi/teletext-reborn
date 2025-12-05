@@ -388,29 +388,29 @@ function renderForecast(forecast, unit) {
   
   // Take first 5 days
   const days = forecast.slice(0, 5);
+  const symbol = unit === 'fahrenheit' ? '°F' : '°C';
   
   const forecastHTML = days.map((day, index) => {
     const dayName = getDayName(day.date);
     const high = day.high !== null ? Math.round(day.high) : '--';
     const low = day.low !== null ? Math.round(day.low) : '--';
-    const condition = truncateToWidth(day.condition || '', 14);
+    const condition = truncateToWidth(day.condition || '', 16);
     const iconChar = getIconChar(day.icon);
-    const symbol = unit === 'fahrenheit' ? '°F' : '°C';
     
-    // Compact format: DAY | ICON HIGH LOW CONDITION
+    // Compact format with better alignment
     return `
-      <div class="forecast-day" data-index="${index}" style="display: flex; align-items: center; padding: 2px 0; gap: 8px; font-size: 0.95em;">
-        <span style="color: var(--tt-cyan); width: 32px;">${dayName}</span>
-        <span style="color: var(--tt-yellow); width: 16px;">${iconChar}</span>
-        <span style="color: var(--tt-green); width: 48px;">${high}${symbol}</span>
-        <span style="color: var(--tt-cyan); width: 48px;">${low}${symbol}</span>
-        <span style="color: var(--tt-white); flex: 1;">${condition}</span>
+      <div class="forecast-day" data-index="${index}" style="display: flex; align-items: center; padding: 3px 0; gap: 6px; border-bottom: 1px solid rgba(0,255,255,0.1);">
+        <span style="color: var(--tt-cyan); width: 36px; font-weight: bold;">${dayName}</span>
+        <span style="color: var(--tt-yellow); width: 18px; text-align: center;">${iconChar}</span>
+        <span style="color: var(--tt-red); width: 50px; text-align: right;">${high}${symbol}</span>
+        <span style="color: var(--tt-cyan); width: 50px; text-align: right;">${low}${symbol}</span>
+        <span style="color: var(--tt-white); flex: 1; text-align: left; padding-left: 8px;">${condition}</span>
       </div>
     `;
   }).join('');
   
   return `
-    <div class="content-line section-header" style="color: var(--tt-cyan); margin-top: 8px;">
+    <div class="content-line section-header" style="color: var(--tt-cyan); margin-top: 6px; font-weight: bold;">
       5-DAY FORECAST
     </div>
     <div class="content-line separator" style="color: var(--tt-cyan); margin: 2px 0;">
@@ -418,12 +418,12 @@ function renderForecast(forecast, unit) {
     </div>
     
     <!-- Forecast Header -->
-    <div class="forecast-header" style="display: flex; align-items: center; color: var(--color-secondary-70); padding: 2px 0; gap: 8px; font-size: 0.9em;">
-      <span style="width: 32px;">DAY</span>
-      <span style="width: 16px;"></span>
-      <span style="width: 48px;">HIGH</span>
-      <span style="width: 48px;">LOW</span>
-      <span style="flex: 1;">CONDITION</span>
+    <div class="forecast-header" style="display: flex; align-items: center; color: var(--tt-cyan); padding: 3px 0; gap: 6px; font-size: 0.9em; background: rgba(0,0,255,0.15);">
+      <span style="width: 36px;">DAY</span>
+      <span style="width: 18px;"></span>
+      <span style="width: 50px; text-align: right;">HIGH</span>
+      <span style="width: 50px; text-align: right;">LOW</span>
+      <span style="flex: 1; padding-left: 8px;">CONDITION</span>
     </div>
     
     <!-- Forecast Days -->
@@ -463,13 +463,13 @@ function getIconChar(iconType) {
 function renderUnitToggle(unit) {
   const currentUnit = unit === 'fahrenheit' ? '°F FAHRENHEIT' : '°C CELSIUS';
   return `
-    <div class="content-line separator" style="color: var(--tt-cyan); margin-top: 8px;">
+    <div class="content-line separator" style="color: var(--tt-cyan); margin-top: 6px;">
       ${createSeparator('━', 40)}
     </div>
-    <div class="content-line unit-info" style="color: var(--color-secondary-70); font-size: 0.9em;">
-      SHOWING: ${currentUnit}
+    <div class="content-line unit-info" style="color: var(--tt-white); font-size: 0.9em; margin-top: 4px;">
+      SHOWING: <span style="color: var(--tt-cyan);">${currentUnit}</span>
     </div>
-    <div class="content-line" style="color: var(--color-secondary-70); font-size: 0.9em;">
+    <div class="content-line" style="color: var(--color-secondary-70); font-size: 0.85em;">
       CHANGE IN SETTINGS (PAGE 900)
     </div>
   `;
