@@ -41,40 +41,40 @@ body {
 
 .teletext-app {
   width: 100%;
-  max-width: 920px;
+  max-width: 840px;
   margin: 0 auto;
   flex-shrink: 0;
   flex-grow: 0;
 }
 
 /* ============================================
-   THE CRT SCREEN - FIXED 880x660 VIEWPORT
-   This is the "glass" - it NEVER resizes
+   THE CRT SCREEN - FIXED 800x600 VIEWPORT
+   Compact but readable - NEVER resizes
    ============================================ */
 
 .teletext-screen {
   position: relative;
   
-  /* FIXED PREMIUM DIMENSIONS - 4:3 aspect ratio */
-  width: 880px;
-  height: 660px;
+  /* FIXED DIMENSIONS - 4:3 aspect ratio, fits most screens */
+  width: 800px;
+  height: 600px;
   
   margin: 0 auto;
   background: var(--color-bg, #000000);
   
   /* Three-zone grid: Header | Content | Navigation */
   display: grid;
-  grid-template-rows: 44px 1fr 88px;
+  grid-template-rows: 42px 1fr 84px;
   grid-template-columns: 1fr;
   
   /* CRT glass curvature */
-  border-radius: 20px;
+  border-radius: 18px;
   
   /* Content stays inside */
   overflow: hidden;
   
-  /* Premium typography */
-  font-size: 14px;
+  /* BIGGER typography for readability */
+  font-size: 13px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
   
   /* Prevent resizing */
@@ -86,36 +86,37 @@ body {
 }
 
 /* ============================================
-   HEADER BAR - FIXED 44px
+   HEADER BAR - FIXED 42px
    ============================================ */
 
 .header-bar {
   background: var(--color-header-bg, #0000FF);
-  padding: 8px 16px;
+  padding: 8px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   
-  height: 44px;
+  height: 42px;
   flex-shrink: 0;
   overflow: hidden;
 }
 
 .header-service-name {
   color: var(--tt-white, #FFFFFF);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 1px;
 }
 
 .header-page-number {
   color: var(--tt-yellow, #FFFF00);
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .header-clock {
   color: var(--tt-white, #FFFFFF);
-  font-size: 12px;
-  min-width: 8ch;
+  font-size: 13px;
+  min-width: 9ch;
 }
 
 /* Time Machine indicator */
@@ -137,7 +138,7 @@ body {
 
 .content-area {
   background: var(--color-bg, #000000);
-  padding: 12px 16px;
+  padding: 14px 20px;
   position: relative;
   
   /* Scrollable when content overflows */
@@ -148,10 +149,10 @@ body {
   min-height: 0;
   height: 100%;
   
-  /* Typography */
-  font-size: 11px;
+  /* BIGGER Typography for readability */
+  font-size: 12px;
   color: var(--color-primary, #FFFF00);
-  line-height: 1.6;
+  line-height: 1.7;
   
   /* Performance */
   contain: layout style;
@@ -189,11 +190,11 @@ body {
 .teletext-page-title {
   text-align: center;
   color: var(--tt-yellow);
-  font-size: 14px;
-  transform: scaleY(1.5);
+  font-size: 16px;
+  transform: scaleY(1.6);
   transform-origin: top;
-  margin-bottom: 8px;
-  padding-bottom: 6px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -215,7 +216,7 @@ body {
 .content-grid {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   width: 100%;
 }
 
@@ -224,50 +225,51 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-height: 1.5em;
+  min-height: 1.6em;
+  font-size: 12px;
 }
 
 /* Separator lines */
 .separator {
   color: var(--tt-cyan);
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: -1px;
 }
 
 /* ============================================
-   NAVIGATION BAR - FIXED 88px
+   NAVIGATION BAR - FIXED 84px
    ============================================ */
 
 .navigation-bar {
   background: var(--color-bg, #000000);
-  padding: 8px 16px;
+  padding: 8px 20px;
   border-top: 2px solid var(--color-header-bg, #0000FF);
   display: flex;
   flex-direction: column;
   gap: 8px;
   justify-content: center;
   
-  height: 88px;
+  height: 84px;
   flex-shrink: 0;
 }
 
 /* Fastext buttons row */
 .fastext-bar {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
 }
 
 .fastext-button {
-  padding: 8px 16px;
+  padding: 8px 18px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: 10px;
+  font-size: 11px;
   border: none;
   cursor: pointer;
   transition: filter 0.15s ease-out, box-shadow 0.15s ease-out, transform 0.1s ease-out;
   position: relative;
   overflow: hidden;
-  min-width: 80px;
+  min-width: 85px;
   text-align: center;
 }
 
@@ -333,9 +335,9 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 14px;
+  padding: 6px 16px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--tt-cyan, #00FFFF);
   background: transparent;
   border: 2px solid var(--tt-cyan, #00FFFF);
@@ -355,9 +357,9 @@ body {
 
 .page-input {
   width: 6ch;
-  padding: 6px 8px;
+  padding: 6px 10px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--tt-yellow, #FFFF00);
   background: var(--tt-black, #000000);
   border: 2px solid var(--tt-cyan, #00FFFF);
