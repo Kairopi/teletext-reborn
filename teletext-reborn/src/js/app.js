@@ -27,6 +27,10 @@ import * as aboutPage from './pages/about.js';
 // Easter Egg pages
 import * as easterEggPage from './pages/easterEgg.js';
 import * as notFoundPage from './pages/notFound.js';
+// Horoscopes pages (Req 27-29)
+import * as horoscopesPage from './pages/horoscopes.js';
+// TV Listings pages (Req 24-26)
+import * as tvListingsPage from './pages/tvListings.js';
 // Easter Eggs system
 import { initKonamiCode, destroyKonamiCode } from './utils/easterEggs.js';
 import { initKeyboardShortcutsOverlay, destroyKeyboardShortcutsOverlay } from './utils/keyboardShortcuts.js';
@@ -52,6 +56,32 @@ const PAGE_REGISTRY = {
   // Easter Egg and 404 pages - use literal numbers to ensure they work
   888: easterEggPage,  // Page 888 Easter Egg
   404: notFoundPage,   // Page 404 Not Found
+  // Horoscopes pages (450-463) - Req 27-29
+  450: horoscopesPage,  // Horoscopes Index
+  451: horoscopesPage,  // Aries
+  452: horoscopesPage,  // Taurus
+  453: horoscopesPage,  // Gemini
+  454: horoscopesPage,  // Cancer
+  455: horoscopesPage,  // Leo
+  456: horoscopesPage,  // Virgo
+  457: horoscopesPage,  // Libra
+  458: horoscopesPage,  // Scorpio
+  459: horoscopesPage,  // Sagittarius
+  460: horoscopesPage,  // Capricorn
+  461: horoscopesPage,  // Aquarius
+  462: horoscopesPage,  // Pisces
+  463: horoscopesPage,  // Lucky Numbers
+  // TV Listings pages (600-609) - Req 24-26
+  600: tvListingsPage,  // TV Guide Index
+  601: tvListingsPage,  // Now On TV
+  602: tvListingsPage,  // Tonight
+  603: tvListingsPage,  // Tomorrow
+  604: tvListingsPage,  // Full Schedule
+  605: tvListingsPage,  // Reserved
+  606: tvListingsPage,  // Reserved
+  607: tvListingsPage,  // Reserved
+  608: tvListingsPage,  // Reserved
+  609: tvListingsPage,  // Reserved
   // Settings and About
   [PAGE_NUMBERS.SETTINGS]: settingsPage,
   [PAGE_NUMBERS.ABOUT]: aboutPage,

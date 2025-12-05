@@ -753,3 +753,187 @@ body {
   display: none !important;
   opacity: 0 !important;
 }
+
+
+/* ============================================
+   HOROSCOPES PAGE STYLES (Req 27-29)
+   ============================================ */
+
+/* Zodiac Grid Layout */
+.zodiac-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zodiac-row {
+  display: flex;
+  justify-content: space-around;
+}
+
+.zodiac-sign {
+  cursor: pointer;
+  padding: 4px;
+  text-align: center;
+  transition: all 0.15s ease-out;
+  border: 1px solid transparent;
+}
+
+.zodiac-sign:hover {
+  filter: brightness(1.2);
+  text-shadow: 0 0 8px currentColor;
+  border-color: var(--tt-cyan);
+  background: rgba(0, 255, 255, 0.05);
+}
+
+.zodiac-symbol {
+  font-size: 20px;
+  color: var(--tt-cyan);
+  line-height: 1.2;
+}
+
+/* Star Twinkle Animation (Req 27.7) */
+.star-decoration {
+  display: inline-block;
+  color: var(--tt-yellow);
+  animation: star-twinkle 1.5s ease-in-out infinite;
+}
+
+.star-decoration:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.star-decoration:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.star-decoration:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.star-decoration:nth-child(5) {
+  animation-delay: 0.8s;
+}
+
+.star-decoration:nth-child(6) {
+  animation-delay: 1.0s;
+}
+
+.star-decoration:nth-child(7) {
+  animation-delay: 1.2s;
+}
+
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+}
+
+/* Star Rating Display (Req 28.5) */
+.star-rating {
+  letter-spacing: 2px;
+}
+
+.star-rating .star-empty {
+  opacity: 0.3;
+}
+
+/* Lucky Numbers Display (Req 29.2) */
+.lucky-numbers-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.lucky-number {
+  font-size: 20px;
+  color: var(--tt-yellow);
+  background: var(--tt-black);
+  border: 2px solid var(--tt-cyan);
+  padding: 8px 12px;
+  min-width: 32px;
+  text-align: center;
+  transition: all 0.1s ease-out;
+}
+
+.lucky-number.rolling {
+  color: var(--tt-cyan);
+  animation: number-roll 0.1s linear infinite;
+}
+
+@keyframes number-roll {
+  0% { transform: translateY(-2px); }
+  50% { transform: translateY(2px); }
+  100% { transform: translateY(-2px); }
+}
+
+/* Horoscope Sign Page Styles (Req 28.1-28.11) */
+.horoscope-sign-page .prediction-text {
+  color: var(--tt-yellow);
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+.horoscope-sign-page .ratings-section {
+  margin: 8px 0;
+}
+
+.horoscope-sign-page .rating-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0;
+}
+
+/* Sign Navigation (Req 28.10) */
+.sign-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.sign-navigation .nav-prev,
+.sign-navigation .nav-next {
+  color: var(--tt-cyan);
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+}
+
+.sign-navigation .nav-prev:hover,
+.sign-navigation .nav-next:hover {
+  color: var(--tt-yellow);
+  text-shadow: 0 0 8px var(--tt-cyan);
+}
+
+/* Generate Button (Req 29.4) */
+.generate-numbers-btn {
+  padding: 10px 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+}
+
+.generate-numbers-btn:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 12px var(--tt-cyan);
+}
+
+.generate-numbers-btn:active {
+  transform: scale(0.95);
+}
+
+/* User Sign Highlight (Req 27.5) */
+.user-sign-notice {
+  color: var(--tt-magenta);
+  text-align: center;
+  animation: user-sign-pulse 2s ease-in-out infinite;
+}
+
+@keyframes user-sign-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}

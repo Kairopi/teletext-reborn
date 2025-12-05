@@ -17,7 +17,7 @@ import gsap from 'gsap';
 import { PAGE_NUMBERS } from '../router.js';
 import { getStateManager } from '../state.js';
 import { formatTeletextDate } from '../utils/date.js';
-import { formatDottedLeader, centerText, createSeparator, BLOCK_CHARS, createBulletPoint } from '../utils/teletext.js';
+import { formatDottedLeader, createSeparator, BLOCK_CHARS } from '../utils/teletext.js';
 import { getLocation } from '../services/geoApi.js';
 import { getCurrentWeather, formatTemperature } from '../services/weatherApi.js';
 

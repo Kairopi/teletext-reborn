@@ -2494,6 +2494,270 @@ const PAGE_REGISTRY = {
 
 ---
 
+## Phase 5: TV Listings & Horoscopes Feature
+
+### Task 2: Horoscope Service ✅
+**File:** `src/js/services/horoscopeService.js`, `src/js/services/horoscopeService.test.js`
+**Status:** Completed
+
+#### What was implemented:
+
+**Horoscope Service (`horoscopeService.js`):**
+
+A service that generates daily horoscope content with mystical predictions, lucky numbers, star ratings, and compatibility information. Uses deterministic generation based on date for consistency.
+
+**Zodiac Signs Data (Req 27.3, 28.2):**
+```javascript
+ZODIAC_SIGNS = [
+  { id: 1, name: 'Aries', symbol: '♈', element: 'fire', dateRange: 'Mar 21 - Apr 19', startMonth: 3, startDay: 21, endMonth: 4, endDay: 19 },
+  { id: 2, name: 'Taurus', symbol: '♉', element: 'earth', dateRange: 'Apr 20 - May 20', ... },
+  // ... all 12 zodiac signs with complete date ranges
+]
+```
+
+**Element Colors (Req 28.2):**
+```javascript
+ELEMENT_COLORS = {
+  fire: '#FF0000',    // Red - Aries, Leo, Sagittarius
+  earth: '#00FF00',   // Green - Taurus, Virgo, Capricorn
+  air: '#00FFFF',     // Cyan - Gemini, Libra, Aquarius
+  water: '#FF00FF'    // Magenta - Cancer, Scorpio, Pisces
+}
+```
+
+**Mystical Predictions Pool (Req 32.6):**
+- 50 authentic mystical phrases for daily horoscope readings
+- Examples:
+  - "The stars align in your favor today. New opportunities await in unexpected places."
+  - "A chance encounter could lead to exciting developments. Stay open to possibilities."
+  - "Your creative energy is at its peak. Channel it into projects close to your heart."
+
+**Core Functions:**
+
+**`generateLuckyNumbers(signId, dateHash)` (Req 28.6, 29.2, 32.7):**
+- Generates 6 unique numbers between 1-49
+- Uses seeded pseudo-random number generator for determinism
+- Returns sorted array of numbers
+- Algorithm: Linear congruential generator with sign and date as seed
+
+**`generateRating(signId, dateHash, type)` (Req 28.5):**
+- Generates star rating 1-5 for love, money, or health
+- Uses seeded random based on sign, date, and type offset
+- Deterministic - same inputs always produce same output
+
+**`getDailyHoroscope(signId)` (Req 28.4-28.8):**
+- Returns complete horoscope object:
+```javascript
+{
+  sign: { id, name, symbol, element, dateRange },
+  prediction: "Mystical phrase...",
+  loveRating: 1-5,
+  moneyRating: 1-5,
+  healthRating: 1-5,
+  luckyNumbers: [6 unique numbers 1-49],
+  luckyColor: "CYAN" | "RED" | "GREEN" | etc.,
+  bestMatch: ["Leo", "Sagittarius"],
+  date: "2025-12-05"
+}
+```
+
+**`getCompatibleSigns(signId)` (Req 28.8):**
+- Returns 2 compatible zodiac sign names
+- Based on astrological compatibility matrix:
+  - Fire signs compatible with Fire and Air
+  - Earth signs compatible with Earth and Water
+  - Air signs compatible with Air and Fire
+  - Water signs compatible with Water and Earth
+
+**`getSignFromBirthday(month, day)` (Req 27.5):**
+- Determines zodiac sign from birth month and day
+- Handles Capricorn's year boundary (Dec 22 - Jan 19)
+- Returns zodiac sign object or null if invalid
+
+**Helper Functions:**
+- `hashDate(date)` - Generate deterministic hash from date
+- `generateLuckyColor(signId, dateHash)` - Pick Teletext color name
+- `getSignById(signId)` - Get sign by ID (1-12)
+- `getAllSigns()` - Get all 12 zodiac signs
+- `getElementColor(element)` - Get hex color for element
+- `formatStarRating(rating)` - Format as "★★★☆☆"
+
+**Determinism:**
+All generated content is deterministic based on date. Users see the same horoscope content if they refresh on the same day.
+
+---
+
+### Task 2.8: Property Test for Lucky Numbers ✅
+**File:** `src/js/services/horoscopeService.test.js`
+**Status:** Completed
+
+**Property 1: Lucky Numbers Uniqueness**
+- *For any* generated set of lucky numbers, all 6 numbers SHALL be unique and within the range 1-49
+- **Validates: Requirements 28.6, 29.2**
+
+**Test Implementation:**
+```javascript
+fc.assert(
+  fc.property(
+    fc.integer({ min: 1, max: 12 }),   // signId
+    fc.integer({ min: 0, max: 999 }),  // dateHash
+    (signId, dateHash) => {
+      const numbers = generateLuckyNumbers(signId, dateHash);
+      
+      // Must have exactly 6 numbers
+      expect(numbers).toHaveLength(6);
+      
+      // All numbers must be unique
+      const unique = new Set(numbers);
+      expect(unique.size).toBe(6);
+      
+      // All numbers must be in range 1-49
+      for (const num of numbers) {
+        expect(num).toBeGreaterThanOrEqual(1);
+        expect(num).toBeLessThanOrEqual(49);
+      }
+      
+      return true;
+    }
+  ),
+  { numRuns: 100 }
+);
+```
+
+---
+
+### Task 2.9: Property Test for Star Rating Range ✅
+**File:** `src/js/services/horoscopeService.test.js`
+**Status:** Completed
+
+**Property 6: Star Rating Range**
+- *For any* horoscope star rating (love, money, health), the value SHALL be between 1 and 5 inclusive
+- **Validates: Requirements 28.5**
+
+**Test Implementation:**
+```javascript
+fc.assert(
+  fc.property(
+    fc.integer({ min: 1, max: 12 }),
+    fc.integer({ min: 0, max: 999 }),
+    fc.constantFrom('love', 'money', 'health'),
+    (signId, dateHash, type) => {
+      const rating = generateRating(signId, dateHash, type);
+      
+      expect(rating).toBeGreaterThanOrEqual(1);
+      expect(rating).toBeLessThanOrEqual(5);
+      expect(Number.isInteger(rating)).toBe(true);
+      
+      return true;
+    }
+  ),
+  { numRuns: 100 }
+);
+```
+
+---
+
+### Additional Unit Tests
+
+**Zodiac Sign Coverage:**
+- Verifies exactly 12 signs exist
+- Verifies unique IDs from 1-12
+- Verifies all required properties (id, name, symbol, element, dateRange)
+- Verifies valid elements (fire, earth, air, water)
+- Verifies valid Unicode symbols
+
+**getDailyHoroscope:**
+- Returns complete horoscope for valid sign IDs
+- Returns null for invalid sign IDs
+- All ratings within 1-5 range
+- Lucky numbers array has 6 elements
+- Best match array has 2 elements
+
+**formatStarRating:**
+- Formats ratings correctly (★★★☆☆)
+- Handles edge cases (0 → ☆☆☆☆☆, 6 → ★★★★★)
+
+**Test Results:** 11 tests passing
+
+---
+
+### Requirements Coverage (Horoscope Service)
+
+| Requirement | Status | Implementation |
+|-------------|--------|----------------|
+| 27.3 | ✅ | ZODIAC_SIGNS - 12 signs with symbols |
+| 27.5 | ✅ | getSignFromBirthday() - birthday detection |
+| 28.2 | ✅ | ELEMENT_COLORS - sign-specific colors |
+| 28.4 | ✅ | getDailyHoroscope() - prediction text |
+| 28.5 | ✅ | generateRating() - star ratings 1-5 |
+| 28.6 | ✅ | generateLuckyNumbers() - 6 unique 1-49 |
+| 28.7 | ✅ | generateLuckyColor() - Teletext color |
+| 28.8 | ✅ | getCompatibleSigns() - 2 compatible signs |
+| 29.2 | ✅ | Lucky numbers uniqueness property test |
+| 32.5 | ✅ | Local generation (no external API) |
+| 32.6 | ✅ | PREDICTIONS - 50 mystical phrases |
+| 32.7 | ✅ | Unique numbers in range 1-49 |
+
+---
+
+## Easter Eggs System
+
+### Easter Eggs Utilities ✅
+**File:** `src/js/utils/easterEggs.js`
+**Status:** Completed
+
+#### What was implemented:
+
+**Color Burst Mode (Req 18.2):**
+- Triggered by typing "BURST" anywhere on the page
+- Simple 5-letter sequence that's easy to remember
+- 2-second timeout resets if user pauses too long
+- Ignores input when typing in text fields (inputs/textareas)
+- Rainbow animation on screen border and text elements
+- Press ESC to exit Color Burst mode
+
+**Core Functions:**
+- `initKonamiCode()` - Initialize secret code detection (listens for "BURST")
+- `destroyKonamiCode()` - Remove event listeners and cleanup
+- `isKonamiActive()` - Check if detection is active
+- `activateColorBurst()` - Activate rainbow animation mode
+- `deactivateColorBurst()` - Deactivate and cleanup animations
+- `isColorBurstActive()` - Check if Color Burst is active
+
+**Confetti Animation (Req 18.4):**
+- `createConfetti()` - Creates 100 confetti pieces with GSAP animation
+- Uses all 6 Teletext colors (excluding black/white)
+- Pieces fall with random rotation and horizontal drift
+- Auto-cleanup after 7 seconds
+
+**Y2K Countdown (Req 18.3):**
+- `isY2K(date)` - Check if date is Dec 31, 1999
+- `createY2KCountdown()` - Returns HTML for Y2K countdown display
+- `startY2KCountdown()` - Starts animated countdown timer
+- Fast countdown for demo effect, ends with confetti
+
+**Birthday Detection (Req 18.4):**
+- `isBirthday(birthday)` - Check if today matches user's birthday
+- `createBirthdayMessage()` - Returns HTML for birthday banner
+- `showBirthdayCelebration()` - Triggers confetti animation
+
+**Testing:**
+- `resetEasterEggs()` - Reset all state for testing
+
+---
+
+### Easter Egg Page (Page 888) ✅
+**File:** `src/js/pages/easterEgg.js`
+**Status:** Completed
+
+**Features:**
+- Displays rotating Teletext fun facts (12 facts)
+- Auto-rotates every 5 seconds with fade animation
+- Shows hint: "TYPE 'BURST' FOR A SURPRISE!"
+- Fastext navigation to Home, News, Time Machine, About
+
+---
+
 ## Test Results Summary
 
 | Test Suite | Tests | Status |
@@ -2513,10 +2777,11 @@ const PAGE_REGISTRY = {
 | Finance API | 53 | ✅ Passing |
 | Wikipedia API | 47 | ✅ Passing |
 | Geo API | 49 | ✅ Passing |
+| Horoscope Service | 11 | ✅ Passing |
 | Home Page | 32 | ✅ Passing |
 | News Page | 25 | ✅ Passing |
 | Weather Page | 33 | ✅ Passing |
-| **Total** | **697** | ✅ **All Passing** |
+| **Total** | **708** | ✅ **All Passing** |
 
 ---
 

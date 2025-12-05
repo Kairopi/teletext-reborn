@@ -38,4 +38,6 @@ coverage/
 .cache/
 
 # MCP sensitive data (tokens should be in env vars)
+# Note: .kiro directory is NOT ignored - it's required for hackathon submission
+# Only the mcp.json with API keys is ignored
 .kiro/settings/mcp.json

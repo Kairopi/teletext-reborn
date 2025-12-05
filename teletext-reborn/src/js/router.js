@@ -22,9 +22,15 @@ const PAGE_NUMBERS = {
   NEWS_SPORTS: 105,
   WEATHER: 200,
   FINANCE: 300,
+  HOROSCOPES: 450,           // Horoscopes index
+  HOROSCOPES_LUCKY: 463,     // Lucky numbers page
   TIME_MACHINE: 500,
   TIME_MACHINE_EVENTS: 501,
   TIME_MACHINE_WEATHER: 502,
+  TV_GUIDE: 600,             // TV Listings index
+  TV_NOW: 601,               // Now on TV
+  TV_TONIGHT: 602,           // Tonight's schedule
+  TV_TOMORROW: 603,          // Tomorrow's schedule
   EASTER_EGG: 888,
   SETTINGS: 900,
   ABOUT: 999,
@@ -39,9 +45,9 @@ const QUICK_ACCESS_PAGES = {
   1: PAGE_NUMBERS.NEWS_TOP,      // 1 = News
   2: PAGE_NUMBERS.WEATHER,       // 2 = Weather
   3: PAGE_NUMBERS.FINANCE,       // 3 = Finance
-  4: PAGE_NUMBERS.TIME_MACHINE,  // 4 = Time Machine
-  5: PAGE_NUMBERS.TIME_MACHINE_EVENTS, // 5 = Historical Events
-  6: PAGE_NUMBERS.TIME_MACHINE_WEATHER, // 6 = Historical Weather
+  4: PAGE_NUMBERS.HOROSCOPES,    // 4 = Horoscopes (Req 31.3)
+  5: PAGE_NUMBERS.TIME_MACHINE,  // 5 = Time Machine
+  6: PAGE_NUMBERS.TV_GUIDE,      // 6 = TV Guide (Req 31.4)
   7: PAGE_NUMBERS.EASTER_EGG,    // 7 = Easter Egg
   8: PAGE_NUMBERS.SETTINGS,      // 8 = Settings
   9: PAGE_NUMBERS.ABOUT,         // 9 = About
@@ -55,7 +61,9 @@ const VALID_PAGE_RANGES = [
   { min: 200, max: 209 },  // Weather
   { min: 300, max: 309 },  // Finance
   { min: 404, max: 404 },  // Not Found (special)
+  { min: 450, max: 463 },  // Horoscopes (Req 31.1)
   { min: 500, max: 504 },  // Time Machine (extended for event detail/timeline)
+  { min: 600, max: 609 },  // TV Listings (Req 31.2)
   { min: 888, max: 888 },  // Easter Egg
   { min: 900, max: 900 },  // Settings
   { min: 999, max: 999 },  // About

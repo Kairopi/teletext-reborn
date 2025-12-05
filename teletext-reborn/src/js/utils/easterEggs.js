@@ -13,25 +13,26 @@
 import gsap from 'gsap';
 
 // ============================================
-// Konami Code Detection
+// Secret Code Detection (Type "BURST")
 // ============================================
 
 /**
- * Konami code sequence: ↑↑↓↓←→←→BA
+ * Secret code sequence: Type "BURST" to activate Color Burst mode
+ * Simple 5-letter word that's easy to remember and type
  */
-const KONAMI_CODE = [
-  'ArrowUp', 'ArrowUp',
-  'ArrowDown', 'ArrowDown',
-  'ArrowLeft', 'ArrowRight',
-  'ArrowLeft', 'ArrowRight',
-  'KeyB', 'KeyA'
-];
+const SECRET_CODE = ['b', 'u', 'r', 's', 't'];
 
 /**
- * Current position in Konami code sequence
+ * Current position in secret code sequence
  * @type {number}
  */
-let konamiIndex = 0;
+let codeIndex = 0;
+
+/**
+ * Timeout to reset code if user pauses too long
+ * @type {number|null}
+ */
+let codeResetTimeout = null;
 
 /**
  * Whether Color Burst mode is active
@@ -46,36 +47,58 @@ let colorBurstActive = false;
 let colorBurstTimeline = null;
 
 /**
- * Konami code keydown handler
+ * Secret code keydown handler
  * @type {Function|null}
  */
 let konamiHandler = null;
 
 /**
- * Initialize Konami code detection
- * Requirement 18.2: Listen for ↑↑↓↓←→←→BA sequence
+ * Initialize secret code detection
+ * Requirement 18.2: Listen for "BURST" sequence to activate Color Burst
  */
 export function initKonamiCode() {
   if (konamiHandler) return; // Already initialized
   
   konamiHandler = (event) => {
-    const key = event.code;
+    // Ignore if user is typing in an input field
+    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+      return;
+    }
+    
+    const key = event.key.toLowerCase();
+    
+    // Only process letter keys
+    if (key.length !== 1 || !/[a-z]/.test(key)) {
+      return;
+    }
+    
+    // Clear previous timeout
+    if (codeResetTimeout) {
+      clearTimeout(codeResetTimeout);
+    }
     
     // Check if key matches expected sequence
-    if (key === KONAMI_CODE[konamiIndex]) {
-      konamiIndex++;
+    if (key === SECRET_CODE[codeIndex]) {
+      codeIndex++;
       
       // Check if sequence complete
-      if (konamiIndex === KONAMI_CODE.length) {
-        konamiIndex = 0;
+      if (codeIndex === SECRET_CODE.length) {
+        codeIndex = 0;
         activateColorBurst();
+      } else {
+        // Reset after 2 seconds of no input
+        codeResetTimeout = setTimeout(() => {
+          codeIndex = 0;
+        }, 2000);
       }
     } else {
-      // Reset if wrong key
-      konamiIndex = 0;
-      // But check if this key starts the sequence
-      if (key === KONAMI_CODE[0]) {
-        konamiIndex = 1;
+      // Reset if wrong key, but check if this key starts the sequence
+      codeIndex = key === SECRET_CODE[0] ? 1 : 0;
+      
+      if (codeIndex === 1) {
+        codeResetTimeout = setTimeout(() => {
+          codeIndex = 0;
+        }, 2000);
       }
     }
   };
@@ -84,14 +107,18 @@ export function initKonamiCode() {
 }
 
 /**
- * Destroy Konami code detection
+ * Destroy secret code detection
  */
 export function destroyKonamiCode() {
   if (konamiHandler) {
     document.removeEventListener('keydown', konamiHandler);
     konamiHandler = null;
   }
-  konamiIndex = 0;
+  if (codeResetTimeout) {
+    clearTimeout(codeResetTimeout);
+    codeResetTimeout = null;
+  }
+  codeIndex = 0;
 }
 
 /**
@@ -137,7 +164,7 @@ export function activateColorBurst() {
   overlay.innerHTML = `
     <div class="color-burst-message">
       <div class="color-burst-title">🌈 COLOR BURST MODE 🌈</div>
-      <div class="color-burst-subtitle">KONAMI CODE ACTIVATED!</div>
+      <div class="color-burst-subtitle">SECRET CODE ACTIVATED!</div>
       <div class="color-burst-hint">Press ESC to exit</div>
     </div>
   `;
@@ -590,5 +617,5 @@ export function showBirthdayCelebration() {
 export function resetEasterEggs() {
   destroyKonamiCode();
   deactivateColorBurst();
-  konamiIndex = 0;
+  codeIndex = 0;
 }
