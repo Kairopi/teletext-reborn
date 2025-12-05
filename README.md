@@ -45,21 +45,15 @@ Teletext was discontinued in 2012 with the digital TV switchover, but its nostal
 - **8-Color Palette**: Only the original Teletext colors (#000, #F00, #0F0, #FF0, #00F, #F0F, #0FF, #FFF)
 - **Press Start 2P Font**: Authentic blocky typography
 - **40-Character Line Width**: Just like the original
-- **CRT Effects**: Scanlines, phosphor glow, vignette, screen curvature, chromatic aberration
 - **TV Bezel Frame**: Complete with power LED indicator
 
 ### 🔵 Premium Animations (GSAP)
 - **Boot Sequence** (3s): CRT warm-up line, static noise, typewriter title
 - **Page Transitions** (0.3-0.4s): Fade, slide, static flash effects
-- **Time Travel Effect** (2.5s): Blur, white flash, year counter animation
 - **Micro-interactions**: Button hover glow, click feedback, menu stagger
 
 ### 🎮 Easter Eggs & Delights
-- **Page 888**: Teletext fun facts with rotating trivia
-- **Page 404**: Humorous "Page Not Found" messages
 - **Color Burst Mode**: Type "BURST" anywhere for rainbow animations!
-- **Y2K Countdown**: Visit Dec 31, 1999 for a special surprise
-- **Birthday Confetti**: Set your birthday in settings for a celebration
 
 ### ⚙️ User Settings (Page 900)
 - Location detection (IP-based or manual)
@@ -68,13 +62,6 @@ Teletext was discontinued in 2012 with the digital TV switchover, but its nostal
 - Theme (Classic Green / Full Color)
 - Scanlines toggle
 - Sound effects toggle
-
-### ♿ Accessibility
-- Full keyboard navigation (1-9 quick access, arrows, Escape)
-- ARIA labels on all interactive elements
-- Reduced motion support
-- High contrast (4.5:1 minimum)
-- Screen reader friendly
 
 ---
 
@@ -88,7 +75,7 @@ Teletext was discontinued in 2012 with the digital TV switchover, but its nostal
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/teletext-reborn.git
+git clone https://github.com/Kairopi/teletext-reborn.git
 cd teletext-reborn
 
 # Navigate to the project
