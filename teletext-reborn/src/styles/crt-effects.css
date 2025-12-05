@@ -1,63 +1,63 @@
 /**
- * Teletext Reborn - CRT Visual Effects
+ * Teletext Reborn - Premium CRT Visual Effects
  * 
- * Premium CRT television effects for authentic retro experience.
- * These effects create the nostalgic feel of viewing Teletext on a CRT TV.
+ * AAA-quality CRT television effects for authentic retro experience.
+ * FIXED FRAME SIZE - The TV bezel NEVER changes dimensions.
  * 
  * Requirements: 2.3, 2.4, 2.13, 24.1-24.8
  */
 
 /* ============================================
-   TV BEZEL FRAME (Req 24.7)
+   PREMIUM TV BEZEL - FIXED SIZE FRAME
+   Like real hardware - the case NEVER resizes
    ============================================ */
 
 .tv-bezel {
   position: relative;
-  padding: 12px;
+  padding: 16px;
+  
+  /* Premium dark metallic gradient */
   background: linear-gradient(
     145deg,
     #4a4a4a 0%,
-    #2d2d2d 30%,
-    #1a1a1a 70%,
+    #2d2d2d 25%,
+    #1a1a1a 60%,
     #0d0d0d 100%
   );
-  border-radius: 20px;
+  
+  border-radius: 24px;
+  
+  /* Premium depth shadows */
   box-shadow: 
-    /* Outer shadow for depth */
-    0 12px 40px rgba(0, 0, 0, 0.6),
-    0 4px 16px rgba(0, 0, 0, 0.4),
-    /* Inner highlight - top edge */
-    inset 0 2px 0 rgba(255, 255, 255, 0.08),
-    /* Inner shadow - bottom edge */
-    inset 0 -3px 6px rgba(0, 0, 0, 0.4);
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    0 8px 24px rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.5);
   
-  /* ========================================
-     FIXED VIEWPORT - TV BEZEL FRAME
-     Premium compact TV case - NEVER resizes
-     ======================================== */
-  width: 100%;
-  max-width: 660px;
+  /* FIXED WIDTH - matches screen + padding */
+  width: 912px;
+  max-width: 912px;
   
-  /* CRITICAL: Nothing escapes the bezel */
+  /* Content stays inside */
   overflow: hidden;
   
-  /* Prevent any flex/grid parent from resizing this */
+  /* Prevent resizing */
   flex-shrink: 0;
   flex-grow: 0;
   
-  /* Ensure this is a containing block */
+  /* Containing block */
   contain: layout;
 }
 
-/* Inner shadow for recessed screen (Req 24.6) */
+/* Inner recessed shadow */
 .tv-bezel::before {
   content: '';
   position: absolute;
-  inset: 10px;
-  border-radius: 14px;
+  inset: 14px;
+  border-radius: 18px;
   box-shadow: 
-    inset 0 0 30px rgba(0, 0, 0, 0.9),
-    inset 0 0 10px rgba(0, 0, 0, 0.5);
+    inset 0 0 40px rgba(0, 0, 0, 0.9),
+    inset 0 0 15px rgba(0, 0, 0, 0.6);
   pointer-events: none;
   z-index: 1;
 }
@@ -66,46 +66,26 @@
 .tv-bezel::after {
   content: '';
   position: absolute;
-  bottom: 8px;
-  right: 16px;
-  width: 5px;
-  height: 5px;
+  bottom: 10px;
+  right: 20px;
+  width: 6px;
+  height: 6px;
   background: var(--tt-green, #00FF00);
   border-radius: 50%;
   box-shadow: 
-    0 0 3px var(--tt-green, #00FF00),
-    0 0 6px var(--tt-green, #00FF00);
+    0 0 4px var(--tt-green, #00FF00),
+    0 0 8px var(--tt-green, #00FF00);
   animation: led-pulse 2s ease-in-out infinite;
   z-index: 20;
 }
 
 @keyframes led-pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 3px var(--tt-green, #00FF00), 0 0 6px var(--tt-green, #00FF00); }
-  50% { opacity: 0.7; box-shadow: 0 0 2px var(--tt-green, #00FF00); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--tt-green, #00FF00), 0 0 8px var(--tt-green, #00FF00); }
+  50% { opacity: 0.6; box-shadow: 0 0 2px var(--tt-green, #00FF00); }
 }
 
 /* ============================================
-   SCREEN CURVATURE (Req 24.1, 2.4)
-   ============================================ */
-
-.crt-screen {
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-  /* Subtle barrel distortion simulation */
-  box-shadow: 
-    inset 0 0 100px rgba(0, 0, 0, 0.3),
-    inset 0 0 50px rgba(0, 0, 0, 0.2);
-}
-
-/* Screen curvature effect using border-radius (2-4px curve) */
-.screen-curve {
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-/* ============================================
-   SCANLINES OVERLAY (Req 2.3, 24.5)
+   SCANLINES OVERLAY
    ============================================ */
 
 .scanlines {
@@ -113,94 +93,55 @@
   inset: 0;
   pointer-events: none;
   z-index: 10;
-  /* 2px spacing, alternating brightness (Req 24.5) */
   background: repeating-linear-gradient(
     0deg,
     transparent 0px,
     transparent 1px,
-    rgba(0, 0, 0, 0.15) 1px,
-    rgba(0, 0, 0, 0.3) 2px
+    rgba(0, 0, 0, 0.2) 1px,
+    rgba(0, 0, 0, 0.35) 2px
   );
 }
 
-/* Alternative scanlines with 30% opacity (Req 2.3) */
-.scanlines-standard {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 10;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0px,
-    transparent 1px,
-    rgba(0, 0, 0, 0.3) 1px,
-    rgba(0, 0, 0, 0.3) 2px
-  );
-}
-
-/* Scanlines toggle class */
-.scanlines-disabled .scanlines,
-.scanlines-disabled .scanlines-standard {
+.scanlines-disabled .scanlines {
   display: none;
 }
 
 /* ============================================
-   PHOSPHOR GLOW EFFECT (Req 24.2, 2.4)
+   PHOSPHOR GLOW EFFECT
    ============================================ */
 
-/* Text glow - 2px blur, 50% opacity in text color */
 .phosphor-glow {
   text-shadow: 
     0 0 2px currentColor,
-    0 0 4px rgba(255, 255, 0, 0.5);
+    0 0 5px rgba(255, 255, 0, 0.4);
 }
 
-/* Specific color glows */
 .glow-yellow {
-  text-shadow: 
-    0 0 2px var(--tt-yellow, #FFFF00),
-    0 0 4px rgba(255, 255, 0, 0.5);
+  text-shadow: 0 0 2px var(--tt-yellow, #FFFF00), 0 0 5px rgba(255, 255, 0, 0.4);
 }
 
 .glow-cyan {
-  text-shadow: 
-    0 0 2px var(--tt-cyan, #00FFFF),
-    0 0 4px rgba(0, 255, 255, 0.5);
+  text-shadow: 0 0 2px var(--tt-cyan, #00FFFF), 0 0 5px rgba(0, 255, 255, 0.4);
 }
 
 .glow-green {
-  text-shadow: 
-    0 0 2px var(--tt-green, #00FF00),
-    0 0 4px rgba(0, 255, 0, 0.5);
+  text-shadow: 0 0 2px var(--tt-green, #00FF00), 0 0 5px rgba(0, 255, 0, 0.4);
 }
 
 .glow-red {
-  text-shadow: 
-    0 0 2px var(--tt-red, #FF0000),
-    0 0 4px rgba(255, 0, 0, 0.5);
+  text-shadow: 0 0 2px var(--tt-red, #FF0000), 0 0 5px rgba(255, 0, 0, 0.4);
 }
 
 .glow-white {
-  text-shadow: 
-    0 0 2px var(--tt-white, #FFFFFF),
-    0 0 4px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 0 2px var(--tt-white, #FFFFFF), 0 0 5px rgba(255, 255, 255, 0.4);
 }
 
 .glow-magenta {
-  text-shadow: 
-    0 0 2px var(--tt-magenta, #FF00FF),
-    0 0 4px rgba(255, 0, 255, 0.5);
-}
-
-/* Screen glow effect */
-.screen-glow {
-  box-shadow: 
-    0 0 20px rgba(255, 255, 0, 0.1),
-    inset 0 0 60px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 0 2px var(--tt-magenta, #FF00FF), 0 0 5px rgba(255, 0, 255, 0.4);
 }
 
 /* ============================================
-   VIGNETTE EFFECT (Req 2.13)
+   VIGNETTE EFFECT
    ============================================ */
 
 .vignette {
@@ -210,28 +151,14 @@
   z-index: 5;
   background: radial-gradient(
     ellipse at center,
-    transparent 50%,
-    rgba(0, 0, 0, 0.3) 80%,
-    rgba(0, 0, 0, 0.5) 100%
-  );
-}
-
-/* Stronger vignette variant */
-.vignette-strong {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 5;
-  background: radial-gradient(
-    ellipse at center,
-    transparent 40%,
-    rgba(0, 0, 0, 0.4) 75%,
-    rgba(0, 0, 0, 0.6) 100%
+    transparent 45%,
+    rgba(0, 0, 0, 0.35) 80%,
+    rgba(0, 0, 0, 0.55) 100%
   );
 }
 
 /* ============================================
-   GLASS REFLECTION OVERLAY (Req 24.3)
+   GLASS REFLECTION OVERLAY
    ============================================ */
 
 .glass-reflection {
@@ -239,51 +166,40 @@
   inset: 0;
   pointer-events: none;
   z-index: 15;
-  /* Diagonal reflection from top-left to bottom-right, 5% opacity */
   background: 
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, 0.05) 0%,
-      transparent 30%
+      rgba(255, 255, 255, 0.06) 0%,
+      transparent 25%
     ),
     linear-gradient(
       135deg,
-      rgba(255, 255, 255, 0.08) 0%,
-      rgba(255, 255, 255, 0.03) 25%,
-      transparent 50%,
-      transparent 100%
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.04) 20%,
+      transparent 45%
     );
 }
 
 /* ============================================
-   RGB CHROMATIC ABERRATION (Req 24.4)
+   RGB CHROMATIC ABERRATION
    ============================================ */
 
-/* 1px offset: red left, blue right */
 .rgb-separation {
   text-shadow:
-    -1px 0 rgba(255, 0, 0, 0.5),
-    1px 0 rgba(0, 0, 255, 0.5);
+    -1px 0 rgba(255, 0, 0, 0.4),
+    1px 0 rgba(0, 0, 255, 0.4);
 }
 
-/* Subtle chromatic aberration for general use */
-.chromatic-aberration {
-  text-shadow:
-    -0.5px 0 rgba(255, 0, 0, 0.3),
-    0.5px 0 rgba(0, 0, 255, 0.3);
-}
-
-/* Combined phosphor glow + chromatic aberration */
 .crt-text {
   text-shadow:
     0 0 2px currentColor,
-    0 0 4px rgba(255, 255, 0, 0.3),
-    -0.5px 0 rgba(255, 0, 0, 0.2),
-    0.5px 0 rgba(0, 0, 255, 0.2);
+    0 0 4px rgba(255, 255, 0, 0.25),
+    -0.5px 0 rgba(255, 0, 0, 0.15),
+    0.5px 0 rgba(0, 0, 255, 0.15);
 }
 
 /* ============================================
-   NOISE TEXTURE OVERLAY (Req 24.8)
+   NOISE TEXTURE OVERLAY
    ============================================ */
 
 .noise-overlay {
@@ -291,47 +207,8 @@
   inset: 0;
   pointer-events: none;
   z-index: 12;
-  opacity: 0.02;
+  opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-}
-
-/* Animated noise for static effect */
-.noise-animated {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 12;
-  opacity: 0;
-  background: repeating-radial-gradient(
-    circle at 50% 50%,
-    rgba(255, 255, 255, 0.1) 0px,
-    transparent 1px,
-    transparent 2px
-  );
-  animation: noise-flicker 0.1s steps(5) infinite;
-}
-
-@keyframes noise-flicker {
-  0% { 
-    opacity: 0.03;
-    background-position: 0 0;
-  }
-  25% { 
-    opacity: 0.02;
-    background-position: 5px 5px;
-  }
-  50% { 
-    opacity: 0.04;
-    background-position: -5px 10px;
-  }
-  75% { 
-    opacity: 0.02;
-    background-position: 10px -5px;
-  }
-  100% { 
-    opacity: 0.03;
-    background-position: -10px 0;
-  }
 }
 
 /* ============================================
@@ -345,16 +222,8 @@
   z-index: 50;
   opacity: 0;
   background: 
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.03) 0px,
-      rgba(0, 0, 0, 0.03) 1px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.03) 0px,
-      rgba(0, 0, 0, 0.03) 1px
-    );
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.04) 0px, rgba(0, 0, 0, 0.04) 1px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0px, rgba(0, 0, 0, 0.04) 1px);
   animation: static-noise 0.05s steps(10) infinite;
 }
 
@@ -366,16 +235,14 @@
   100% { background-position: -2px -1px, 1px -2px; }
 }
 
-/* Static visible state */
 .static-overlay.visible {
   opacity: 0.5;
 }
 
 /* ============================================
-   IDLE SCREEN FLICKER (Req 2.9)
+   IDLE SCREEN FLICKER
    ============================================ */
 
-/* Subtle brightness flicker after 30s idle */
 .idle-flicker {
   animation: idle-brightness 4s ease-in-out infinite;
 }
@@ -415,7 +282,7 @@
 }
 
 /* ============================================
-   COMBINED CRT EFFECT CONTAINER
+   CRT CONTAINER
    ============================================ */
 
 .crt-container {
@@ -424,90 +291,61 @@
   border-radius: 20px;
 }
 
-/* Apply all CRT effects */
 .crt-container::before {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 5;
-  /* Vignette */
   background: radial-gradient(
     ellipse at center,
-    transparent 50%,
-    rgba(0, 0, 0, 0.3) 80%,
-    rgba(0, 0, 0, 0.5) 100%
+    transparent 45%,
+    rgba(0, 0, 0, 0.35) 80%,
+    rgba(0, 0, 0, 0.55) 100%
   );
 }
 
 /* ============================================
-   REDUCED MOTION SUPPORT (Req 25.10)
+   REDUCED MOTION SUPPORT
    ============================================ */
 
 @media (prefers-reduced-motion: reduce) {
   .idle-flicker,
-  .noise-animated,
   .static-overlay {
     animation: none;
   }
   
-  .led-pulse {
+  .tv-bezel::after {
     animation: none;
   }
-}
-
-/* Manual reduced motion toggle */
-.reduced-motion .idle-flicker,
-.reduced-motion .noise-animated,
-.reduced-motion .static-overlay {
-  animation: none;
 }
 
 /* ============================================
    EFFECT TOGGLE CLASSES
    ============================================ */
 
-/* Disable individual effects */
-.no-scanlines .scanlines,
-.no-scanlines .scanlines-standard { display: none; }
-
-.no-vignette .vignette,
-.no-vignette .vignette-strong { display: none; }
-
-.no-glow .phosphor-glow,
-.no-glow .glow-yellow,
-.no-glow .glow-cyan,
-.no-glow .glow-green,
-.no-glow .glow-red,
-.no-glow .glow-white,
-.no-glow .glow-magenta { text-shadow: none; }
-
-.no-noise .noise-overlay,
-.no-noise .noise-animated { display: none; }
-
+.no-scanlines .scanlines { display: none; }
+.no-vignette .vignette { display: none; }
+.no-glow .phosphor-glow { text-shadow: none; }
+.no-noise .noise-overlay { display: none; }
 .no-reflection .glass-reflection { display: none; }
-
-.no-aberration .rgb-separation,
-.no-aberration .chromatic-aberration { text-shadow: none; }
 
 /* ============================================
    RESPONSIVE TV BEZEL
-   Scales elegantly while maintaining proportions
    ============================================ */
 
-/* Tablet */
-@media (max-width: 720px) {
+@media (max-width: 920px) {
   .tv-bezel {
+    width: 100%;
     max-width: 100%;
-    padding: 10px;
-    border-radius: 16px;
+    padding: 12px;
+    border-radius: 18px;
   }
 }
 
-/* Mobile */
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .tv-bezel {
-    padding: 8px;
-    border-radius: 12px;
+    padding: 10px;
+    border-radius: 14px;
   }
 }
