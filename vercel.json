@@ -1,0 +1,9 @@
+{
+  "buildCommand": "cd teletext-reborn && npm install && npm run build",
+  "outputDirectory": "teletext-reborn/dist",
+  "installCommand": "cd teletext-reborn && npm install",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
