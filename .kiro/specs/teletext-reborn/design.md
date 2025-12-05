@@ -3044,3 +3044,261 @@ html {
 - [x] Comprehensive documentation
 
 **TOTAL: 220+ specifications - FOCUSED & POLISHED** 🏆
+
+
+---
+
+## Enhanced Time Machine - "Today in History" Design (Requirements 34-35)
+
+### Overview
+
+The Enhanced Time Machine transforms the original Time Machine into a History.com-inspired "Today in History" experience. Key improvements:
+- **Simplified date selection**: Month and day only (no year needed)
+- **Defaults to TODAY**: Users immediately see what happened on today's date
+- **Featured events**: Highlighted "Event of the Day" with full descriptions
+- **Holiday support**: Shows holidays for the selected date
+- **Event details**: Click any event to see full description and Wikipedia link
+- **Better pagination**: 8 items per page with category tabs
+
+### Page Structure
+
+| Page | Name | Description |
+|------|------|-------------|
+| 500 | Date Selection | Simplified month/day picker with quick jumps |
+| 501 | Overview | Featured event, category tabs, paginated list |
+| 503 | Event Detail | Full event description with Wikipedia link |
+| 504 | Timeline View | Events organized by century (future) |
+
+### Enhanced Wikipedia API
+
+```javascript
+// New API functions in wikipediaApi.js
+const ENHANCED_LIMITS = {
+  events: 50,      // Was 10
+  births: 25,      // Was 5
+  deaths: 15,      // Was 3
+  selected: 5,     // Featured/curated events
+  holidays: 10,    // Holidays for the date
+};
+
+// Main function
+async function getEnhancedOnThisDay(month, day) {
+  // Returns:
+  return {
+    events: [],           // Array of event objects
+    births: [],           // Array of birth objects
+    deaths: [],           // Array of death objects
+    selected: [],         // Featured/curated events
+    holidays: [],         // Holidays for this date
+    featuredEvent: {},    // Single featured event
+    totalEvents: number,
+    totalBirths: number,
+    totalDeaths: number,
+  };
+}
+
+// Event object structure
+interface EnhancedEvent {
+  year: number;
+  description: string;      // Short description (truncated)
+  fullDescription: string;  // Full description
+  type: 'event' | 'birth' | 'death';
+  wikipediaUrl?: string;    // Direct link to Wikipedia
+  pageTitle?: string;       // Related Wikipedia page title
+  pageDescription?: string; // Related page description
+  thumbnailUrl?: string;    // Thumbnail image URL
+}
+```
+
+### Page 500: Date Selection Layout
+
+```
+┌─────────────────────────────────────────┐
+│ TELETEXT        P.500        12:45:30   │
+├─────────────────────────────────────────┤
+│                                         │
+│      ★ TODAY IN HISTORY ★               │
+│                                         │
+│   DISCOVER WHAT HAPPENED ON ANY DAY     │
+│                                         │
+│   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━   │
+│                                         │
+│           DECEMBER 5                    │
+│              (TODAY)                    │
+│                                         │
+│   ┌────────────┐  ┌────────┐           │
+│   │  December  │  │   05   │           │
+│   └────────────┘  └────────┘           │
+│                                         │
+│      [ 🔍 EXPLORE THIS DAY ]            │
+│                                         │
+│   ─────────────────────────────────────│
+│   QUICK JUMPS:                          │
+│   • ★ YOUR BIRTHDAY - Dec 25           │
+│   • 📅 TODAY - Dec 5                    │
+│   • 🌙 MOON LANDING - Jul 20           │
+│   • 🧱 BERLIN WALL - Nov 9             │
+│   • 🎆 NEW YEARS DAY - Jan 1           │
+│   • 💘 VALENTINES - Feb 14             │
+│                                         │
+├─────────────────────────────────────────┤
+│ 🔴TODAY  🟢EXPLORE  🟡RANDOM  🔵HOME    │
+│ [◄PREV]      [___]      [NEXT►]         │
+└─────────────────────────────────────────┘
+```
+
+### Page 501: Overview Layout
+
+```
+┌─────────────────────────────────────────┐
+│ TELETEXT        P.501        12:45:30   │
+├─────────────────────────────────────────┤
+│                                         │
+│         ★ DECEMBER 5 ★                  │
+│                                         │
+│ 🎉 INTERNATIONAL VOLUNTEER DAY          │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ ★ FEATURED EVENT                    │ │
+│ │ 1933: Prohibition ends in the       │ │
+│ │ United States with ratification     │ │
+│ │ of the 21st Amendment...            │ │
+│ │ ▶ CLICK FOR DETAILS                 │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ ┌────────┬────────┬────────┬─────────┐ │
+│ │EVENTS  │BIRTHS  │DEATHS  │HOLIDAYS │ │
+│ │ (50)   │ (25)   │ (15)   │  (3)    │ │
+│ └────────┴────────┴────────┴─────────┘ │
+│ ─────────────────────────────────────── │
+│ 1933: Prohibition ends in USA...       │
+│ 1955: Rosa Parks arrested...           │
+│ 1791: Mozart dies in Vienna...         │
+│ 2013: Nelson Mandela dies...           │
+│ ...                                     │
+│                                         │
+│         PAGE 1/7  [◄PREV] [NEXT►]       │
+│                                         │
+│ SOURCE: WIKIPEDIA • CLICK FOR DETAILS   │
+├─────────────────────────────────────────┤
+│ 🔴EVENTS  🟢BIRTHS  🟡DEATHS  🔵NEW DATE│
+│ [◄PREV]      [___]      [NEXT►]         │
+└─────────────────────────────────────────┘
+```
+
+### Page 503: Event Detail Layout
+
+```
+┌─────────────────────────────────────────┐
+│ TELETEXT        P.503        12:45:30   │
+├─────────────────────────────────────────┤
+│                                         │
+│ DECEMBER 5           EVENTS 1/50        │
+│                                         │
+│              1933                       │
+│                                         │
+│ ═══════════════════════════════════════ │
+│                                         │
+│ Prohibition in the United States        │
+│ ends with the ratification of the       │
+│ Twenty-first Amendment to the           │
+│ United States Constitution,             │
+│ repealing the Eighteenth Amendment.     │
+│ This marked the end of the "Noble       │
+│ Experiment" that had banned the         │
+│ manufacture, sale, and transport        │
+│ of alcoholic beverages since 1920.      │
+│                                         │
+│ ─────────────────────────────────────── │
+│ RELATED:                                │
+│ Twenty-first Amendment                  │
+│ Amendment to the US Constitution        │
+│                                         │
+│    📖 READ MORE ON WIKIPEDIA            │
+│                                         │
+│ ◄ PREV      ▲ BACK TO LIST      NEXT ► │
+│                                         │
+├─────────────────────────────────────────┤
+│ 🔴PREV  🟢NEXT  🟡BACK  🔵HOME          │
+│ [◄PREV]      [___]      [NEXT►]         │
+└─────────────────────────────────────────┘
+```
+
+### State Management
+
+```javascript
+// Enhanced Time Machine state
+const timeMachineState = {
+  selectedMonth: number,      // 1-12, defaults to current month
+  selectedDay: number,        // 1-31, defaults to current day
+  currentPage: number,        // 500, 501, 503, or 504
+  currentCategory: string,    // 'events', 'births', 'deaths', 'holidays'
+  currentPageNum: number,     // Pagination (0-indexed)
+  selectedEventIndex: number, // For detail view (-1 if none)
+  historyData: object | null, // Cached API response
+  isLoading: boolean,
+  errorMessage: string | null,
+};
+```
+
+### Animation Specifications
+
+| Animation | Duration | Easing | Description |
+|-----------|----------|--------|-------------|
+| Date transition | 0.3s | power2.in/out | Blur + brightness when exploring |
+| Content stagger | 0.2s + 0.03s/item | power2.out | Event items fade in |
+| Category switch | 0.15s | power1.out | Tab highlight change |
+| Detail navigation | 0.2s | power2.out | Prev/next event transition |
+
+### Color Coding
+
+| Element | Color | CSS Variable |
+|---------|-------|--------------|
+| Event years | Cyan | var(--tt-cyan) |
+| Birth years | Green | var(--tt-green) |
+| Death years | Red | var(--tt-red) |
+| Holiday banner | Yellow on Blue | var(--tt-yellow), var(--tt-blue) |
+| Featured event border | Cyan | var(--tt-cyan) |
+| Wikipedia links | Green | var(--tt-green) |
+
+### Fastext Button Configuration
+
+**Page 500 (Date Selection):**
+| Button | Label | Action |
+|--------|-------|--------|
+| Red | TODAY | Reset to current date |
+| Green | EXPLORE | Navigate to overview |
+| Yellow | RANDOM | Select random date |
+| Cyan | HOME | Go to home page |
+
+**Page 501 (Overview):**
+| Button | Label | Action |
+|--------|-------|--------|
+| Red | EVENTS | Switch to events category |
+| Green | BIRTHS | Switch to births category |
+| Yellow | DEATHS | Switch to deaths category |
+| Cyan | NEW DATE | Return to date selection |
+
+**Page 503 (Detail):**
+| Button | Label | Action |
+|--------|-------|--------|
+| Red | PREV | Previous event |
+| Green | NEXT | Next event |
+| Yellow | BACK | Return to overview |
+| Cyan | HOME | Go to home page |
+
+### Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `src/js/pages/timeMachineEnhanced.js` | Enhanced Time Machine page component |
+| `src/js/services/wikipediaApi.js` | Enhanced Wikipedia API with new functions |
+| `src/js/app.js` | Updated PAGE_REGISTRY with pages 503, 504 |
+
+### Requirements Coverage
+
+| Requirement | Acceptance Criteria | Status |
+|-------------|---------------------|--------|
+| 34 | Enhanced Time Machine | 15/15 ✅ |
+| 35 | Enhanced Wikipedia API | 8/8 ✅ |
+

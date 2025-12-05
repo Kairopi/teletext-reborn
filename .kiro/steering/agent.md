@@ -7,11 +7,20 @@
 1. `.kiro/specs/teletext-reborn/tasks.md` - Current task list and progress
 2. `.kiro/specs/teletext-reborn/requirements.md` - All 34 requirements with 220+ acceptance criteria
 3. `.kiro/specs/teletext-reborn/design.md` - Architecture, components, animations, APIs
+4. `teletext-reborn/docs/IMPLEMENTATION.md` - **What was already implemented and how** (patterns, code structure, test patterns)
+
+**The IMPLEMENTATION.md is essential** - it documents:
+- What components exist and their interfaces
+- How each feature was implemented
+- Code patterns and conventions used
+- Test patterns and property-based testing approaches
+- Current test results and coverage
 
 **NEVER guess or assume.** If confused about ANY aspect:
-1. Use `mcp_Ref_ref_search_documentation` to find relevant documentation
-2. Use `mcp_sequential_thinking_sequentialthinking` to reason through complex problems
-3. Ask the user for clarification before proceeding
+1. Check `IMPLEMENTATION.md` first to see if similar functionality was already built
+2. Use `mcp_Ref_ref_search_documentation` to find relevant documentation
+3. Use `mcp_sequential_thinking_sequentialthinking` to reason through complex problems
+4. Ask the user for clarification before proceeding
 
 ---
 
@@ -56,8 +65,44 @@ Build an **AAA-quality web application** that:
 1. **Read the task description completely**
 2. **Cross-reference with requirements.md** - Find the exact acceptance criteria
 3. **Check design.md** - Understand the component interfaces and data models
-4. **Identify dependencies** - What must exist before this task?
-5. **Plan the implementation** - Use sequential thinking for complex tasks
+4. **Read IMPLEMENTATION.md** - See what's already built and follow established patterns
+5. **Identify dependencies** - What must exist before this task?
+6. **Plan the implementation** - Use sequential thinking for complex tasks
+
+### Existing Implementation Patterns (from IMPLEMENTATION.md)
+
+When implementing new features, follow these established patterns:
+
+**Singleton Pattern (used by StateManager, PageRouter):**
+```javascript
+let instance = null;
+export function getInstance() {
+  if (!instance) instance = new ClassName();
+  return instance;
+}
+export function resetInstance() { instance = null; }
+```
+
+**Property-Based Testing Pattern:**
+```javascript
+import fc from 'fast-check';
+fc.assert(
+  fc.asyncProperty(arbitraryGenerator, async (input) => {
+    // Test property holds for all inputs
+    return true;
+  }),
+  { numRuns: 100 }
+);
+```
+
+**JSDoc Documentation Pattern:**
+```javascript
+/**
+ * Brief description
+ * @param {Type} paramName - Description
+ * @returns {ReturnType} Description
+ */
+```
 
 ---
 
@@ -154,6 +199,44 @@ Build an **AAA-quality web application** that:
 - Grid: 40 columns × 22 rows
 - Three zones: Header (1 row), Content (20-22 rows), Navigation (2 rows)
 
+### Frame Size Consistency (CRITICAL - NO EXCEPTIONS)
+
+**The Teletext screen frame MUST maintain a FIXED size across ALL pages.**
+
+When navigating between pages (Home → Weather → Finance → etc.), the frame size must NEVER change. This creates an authentic TV experience where the "screen" stays fixed and only the content inside changes.
+
+**Fixed Dimensions (Desktop):**
+```
+.teletext-app:     max-width: 840px (800px screen + bezel padding)
+.tv-bezel:         height: 620px (600px screen + 20px padding)
+.teletext-screen:  800px × 600px (4:3 aspect ratio)
+```
+
+**Fixed Dimensions (Tablet 769-1024px):**
+```
+.tv-bezel:         height: 520px (500px screen + 20px padding)
+.teletext-screen:  height: 500px
+```
+
+**Fixed Dimensions (Mobile <768px):**
+```
+.tv-bezel:         height: 416px (400px screen + 16px padding)
+.teletext-screen:  height: 400px
+```
+
+**CSS Requirements:**
+- Use `!important` on height constraints to prevent any override
+- Use `flex-shrink: 0; flex-grow: 0;` to prevent flex/grid resizing
+- Content area uses `overflow-y: auto` for scrolling when content exceeds space
+- Navigation bar stays pinned at bottom via CSS Grid `grid-template-rows: auto 1fr auto`
+
+**Implementation Files:**
+- `src/styles/main.css` - `.teletext-screen` fixed height
+- `src/styles/crt-effects.css` - `.tv-bezel` fixed height
+
+**Verification:**
+Before marking any page implementation complete, navigate between ALL pages and verify the frame size remains IDENTICAL. The TV bezel and screen dimensions must not shift by even 1 pixel.
+
 ### Animation Timings (STRICT)
 | Animation | Duration | Easing |
 |-----------|----------|--------|
@@ -206,6 +289,33 @@ Before marking ANY animation task complete:
 
 ---
 
+## Implemented Components Reference
+
+**Always check IMPLEMENTATION.md for full details. Quick reference:**
+
+### StateManager (`src/js/state.js`)
+- Settings persistence: `getSettings()`, `updateSettings()`, `resetSettings()`
+- Time Machine state: `getCurrentDate()`, `setTimeMachineDate()`, `isTimeMachineActive()`
+- Cache management: `getCache(key)`, `setCache(key, value, ttl)`, `clearCache()`
+- Singleton: `getStateManager()`, `resetStateManager()`
+
+### PageRouter (`src/js/router.js`)
+- Navigation: `navigate(pageNumber)`, `getCurrentPage()`, `goBack()`, `goForward()`, `goHome()`
+- Sequential nav: `goToPreviousPage()`, `goToNextPage()`
+- History: `getHistory()`, `canGoBack()`, `canGoForward()`, `clearHistory()`
+- Keyboard: `initKeyboardShortcuts()`, `destroyKeyboardShortcuts()`
+- Control: `disableNavigation()`, `enableNavigation()`
+- Callbacks: `onNavigate(callback)` returns unsubscribe function
+- Singleton: `getRouter()`, `resetRouter()`
+
+### Color Utilities (`src/js/utils/colors.js`)
+- `TELETEXT_COLORS` - Array of 8 valid colors
+- `isTeletextColor(color)` - Validate color
+- `normalizeColor(color)` - Normalize to uppercase hex
+- `validateColorPalette(colors)` - Validate array of colors
+
+---
+
 ## Common Pitfalls to Avoid
 
 1. **Don't use arbitrary colors** - Only the 8 Teletext colors
@@ -216,6 +326,7 @@ Before marking ANY animation task complete:
 6. **Don't use wrong animation easing** - Follow the spec exactly
 7. **Don't skip accessibility** - ARIA labels, keyboard nav, contrast
 8. **Don't forget caching** - All API responses must be cached
+9. **Don't reinvent patterns** - Check IMPLEMENTATION.md for existing patterns
 
 ---
 

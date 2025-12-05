@@ -33,71 +33,109 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #111;
-  padding: 20px;
+  background: #111111; /* Slightly lighter for contrast with TV bezel */
+  padding: 16px;
 }
 
 /* ============================================
    MAIN SCREEN CONTAINER (Req 0.6, 0.8)
+   FIXED VIEWPORT ARCHITECTURE - Premium CRT TV Simulation
    ============================================ */
 
 .teletext-app {
+  /* Compact, elegant TV dimensions */
   width: 100%;
-  max-width: 840px; /* 800px screen + 40px bezel */
+  max-width: 660px;
   margin: 0 auto;
+  
+  /* Prevent any flex/grid parent from resizing this */
+  flex-shrink: 0;
+  flex-grow: 0;
 }
 
 .teletext-screen {
+  /* ========================================
+     FIXED VIEWPORT - THE "CRT GLASS"
+     This NEVER changes size - like real hardware
+     ======================================== */
   position: relative;
+  
+  /* Compact 4:3 aspect ratio - 640x480 base */
   width: 100%;
-  max-width: 800px;
-  /* 4:3 aspect ratio (Req 0.8) */
+  max-width: 640px;
   aspect-ratio: 4 / 3;
+  
   margin: 0 auto;
   background: var(--color-bg, #000000);
   
   /* Three-zone grid layout (Req 0.1) */
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 32px 1fr 72px; /* Header: 32px, Content: flexible, Nav: 72px */
+  grid-template-columns: 1fr;
   
   /* CRT styling */
-  border-radius: 20px;
+  border-radius: 12px;
+  
+  /* CRITICAL: Hidden overflow ensures content never expands the container */
   overflow: hidden;
+  
+  /* Compact font size for better fit */
+  font-size: 12px;
+  
+  /* Prevent any flex/grid parent from resizing this */
+  flex-shrink: 0;
+  flex-grow: 0;
+  
+  /* Ensure this is a containing block for absolute children */
+  isolation: isolate;
 }
 
 /* ============================================
    HEADER BAR (Req 0.2)
+   FIXED HEIGHT - Part of the static frame
    ============================================ */
 
 .header-bar {
   background: var(--color-header-bg, #0000FF);
-  padding: 8px 16px;
+  padding: 6px 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
+  /* FIXED HEIGHT - never changes */
+  height: 32px;
   min-height: 32px;
+  max-height: 32px;
+  
+  /* Prevent flex/grid from resizing */
+  flex-shrink: 0;
+  flex-grow: 0;
+  
+  /* Ensure content doesn't overflow */
+  overflow: hidden;
 }
 
 /* Service name - left aligned (Req 0.2) */
 .header-service-name {
   color: var(--tt-white, #FFFFFF);
-  font-size: var(--font-size-base, 14px);
+  font-size: 11px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
+  letter-spacing: 0.5px;
 }
 
 /* Page number - center (Req 0.2) */
 .header-page-number {
   color: var(--tt-yellow, #FFFF00);
-  font-size: var(--font-size-base, 14px);
+  font-size: 11px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
 }
 
 /* Live clock - right aligned (Req 0.2, 2.6) */
 .header-clock {
   color: var(--tt-white, #FFFFFF);
-  font-size: var(--font-size-base, 14px);
+  font-size: 11px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  min-width: 8ch; /* HH:MM:SS */
+  min-width: 7ch; /* HH:MM:SS */
 }
 
 /* Time Machine active indicator (Req 30.10) */
@@ -120,55 +158,116 @@ body {
 
 /* ============================================
    CONTENT AREA (Req 0.3)
+   SCROLLABLE VIEWPORT - Content changes here, frame stays fixed
    ============================================ */
 
 .content-area {
   background: var(--color-bg, #000000);
-  padding: 16px;
-  overflow: hidden;
+  padding: 8px 12px;
   position: relative;
   
-  /* 40x22 character grid (Req 0.3) */
+  /* CRITICAL: This is the scrollable viewport within the fixed frame */
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  /* CRITICAL: Allow grid to control height */
+  min-height: 0;
+  height: 100%;
+  
+  /* Compact typography */
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: var(--font-size-base, 14px);
+  font-size: 10px;
   color: var(--color-primary, #FFFF00);
   line-height: 1.5;
+  
+  /* Ensure content area is a containing block */
+  contain: layout style;
+}
+
+/* ============================================
+   CONSISTENT PAGE LAYOUT SYSTEM
+   All pages MUST use these classes for frame consistency
+   ============================================ */
+
+/* Page wrapper - ensures all pages have same structure */
+.teletext-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Page title - STANDARDIZED across all pages */
+.teletext-page-title {
+  text-align: center;
+  color: var(--tt-yellow);
+  font-size: 12px;
+  transform: scaleY(1.4);
+  transform-origin: top;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Page scrollable content area */
+.teletext-page-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+/* Page footer - always at bottom */
+.teletext-page-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+  padding-top: 4px;
+  font-size: 9px;
+  color: var(--color-secondary-70);
 }
 
 /* Character grid container */
 .content-grid {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  max-width: 40ch;
+  gap: 2px;
+  max-width: 100%;
   margin: 0 auto;
+  min-height: 0;
+  width: 100%;
 }
 
 /* Individual content line */
 .content-line {
-  max-width: 40ch;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-height: 1.5em;
+  min-height: 1.4em;
 }
 
-/* Scrollable content (rare case - Req 0.3) */
-.content-area.scrollable {
-  overflow-y: auto;
+/* Content area scrollbar styling - thin and subtle */
+.content-area::-webkit-scrollbar {
+  width: 4px;
 }
 
-.content-area.scrollable::-webkit-scrollbar {
-  width: 8px;
-}
-
-.content-area.scrollable::-webkit-scrollbar-track {
+.content-area::-webkit-scrollbar-track {
   background: var(--tt-black, #000000);
 }
 
-.content-area.scrollable::-webkit-scrollbar-thumb {
+.content-area::-webkit-scrollbar-thumb {
   background: var(--tt-cyan, #00FFFF);
-  border-radius: 4px;
+  border-radius: 2px;
+}
+
+/* Firefox scrollbar */
+.content-area {
+  scrollbar-width: thin;
+  scrollbar-color: var(--tt-cyan, #00FFFF) var(--tt-black, #000000);
 }
 
 /* ============================================
@@ -177,32 +276,38 @@ body {
 
 .navigation-bar {
   background: var(--color-bg, #000000);
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-top: 2px solid var(--color-header-bg, #0000FF);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  
+  /* PINNED TO BOTTOM - navigation never moves */
+  flex-shrink: 0;
+  height: 72px;
+  min-height: 72px;
+  max-height: 72px;
 }
 
 /* Row 1: Fastext buttons (Req 0.4) */
 .fastext-bar {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 /* Fastext button base styles */
 .fastext-button {
-  padding: 8px 16px;
+  padding: 6px 12px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: var(--font-size-small, 12px);
+  font-size: 8px;
   border: none;
   cursor: pointer;
   transition: filter 0.15s ease-out, box-shadow 0.15s ease-out, transform 0.1s ease-out;
   position: relative;
   overflow: hidden;
-  min-width: 80px;
+  min-width: 60px;
   text-align: center;
 }
 
@@ -262,7 +367,7 @@ body {
 /* Row 2: Page navigation (Req 0.4) */
 .page-nav-bar {
   display: flex;
-  gap: 16px;
+  gap: 8px;
   justify-content: center;
   align-items: center;
 }
@@ -272,18 +377,19 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
+  padding: 4px 10px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: var(--font-size-base, 14px);
+  font-size: 8px;
   color: var(--tt-cyan, #00FFFF);
   background: transparent;
-  border: 2px solid var(--tt-cyan, #00FFFF);
+  border: 1px solid var(--tt-cyan, #00FFFF);
   cursor: pointer;
   transition: transform 0.15s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 .nav-arrow:hover {
-  transform: scale(1.2);
+  transform: scale(1.05);
+  background: rgba(0, 255, 255, 0.1);
 }
 
 .nav-arrow:active {
@@ -293,12 +399,12 @@ body {
 /* Page number input (Req 0.5) */
 .page-input {
   width: 5ch;
-  padding: 8px;
+  padding: 4px 6px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: var(--font-size-base, 14px);
+  font-size: 9px;
   color: var(--tt-yellow, #FFFF00);
   background: var(--tt-black, #000000);
-  border: 2px solid var(--tt-cyan, #00FFFF);
+  border: 1px solid var(--tt-cyan, #00FFFF);
   text-align: center;
   outline: none;
 }
@@ -419,6 +525,30 @@ body {
   display: flex;
   gap: 16px;
   justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* 404 Page Not Found (Req 3.5, 18.5) */
+.error-404 {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.error-404 .error-ascii {
+  font-family: 'Press Start 2P', monospace;
+  white-space: pre;
+  line-height: 1.2;
+}
+
+.error-404 .error-subtitle {
+  font-size: 16px;
+}
+
+.error-404 .error-suggestions {
+  text-align: left;
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1.8;
 }
 
 /* Success flash (Req 27.7) */
@@ -495,131 +625,128 @@ body {
    ============================================ */
 
 /* Desktop (default) - Req 13.1 */
-@media (min-width: 1025px) {
-  .teletext-screen {
-    max-width: 800px;
-    font-size: 14px;
-  }
-}
+/* Base styles are optimized for desktop */
 
 /* Tablet (Req 13.2) */
-@media (max-width: 1024px) and (min-width: 769px) {
+@media (max-width: 720px) {
   body {
-    padding: 16px;
+    padding: 12px;
+  }
+  
+  .teletext-app {
+    max-width: 100%;
   }
   
   .teletext-screen {
     max-width: 100%;
-    font-size: 13px;
+    font-size: 11px;
+    border-radius: 10px;
+  }
+  
+  .header-bar {
+    height: 28px;
+    min-height: 28px;
+    max-height: 28px;
+    padding: 4px 10px;
+  }
+  
+  .header-service-name,
+  .header-page-number,
+  .header-clock {
+    font-size: 9px;
   }
   
   .content-area {
-    padding: 12px;
+    padding: 6px 10px;
+    font-size: 9px;
+  }
+  
+  .navigation-bar {
+    height: 64px;
+    min-height: 64px;
+    max-height: 64px;
+    padding: 4px 8px;
+    gap: 4px;
   }
   
   .fastext-button {
-    min-width: 70px;
-    padding: 10px 12px;
-    /* Touch-friendly: 44px minimum */
-    min-height: 44px;
+    min-width: 50px;
+    padding: 5px 8px;
+    font-size: 7px;
   }
   
   .nav-arrow {
-    min-width: 44px;
-    min-height: 44px;
+    padding: 3px 8px;
+    font-size: 7px;
+  }
+  
+  .page-input {
+    font-size: 8px;
+    padding: 3px 4px;
   }
 }
 
 /* Mobile (Req 13.3) */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   body {
     padding: 8px;
   }
   
   .teletext-screen {
-    font-size: 11px;
-    border-radius: 12px;
-    /* Allow taller aspect ratio on mobile */
-    aspect-ratio: auto;
-    min-height: 100vh;
-    max-height: none;
+    font-size: 10px;
+    border-radius: 8px;
+    grid-template-rows: 26px 1fr 58px;
   }
   
   .header-bar {
-    padding: 8px 12px;
-    flex-wrap: wrap;
-    gap: 4px;
+    height: 26px;
+    min-height: 26px;
+    max-height: 26px;
+    padding: 4px 8px;
   }
   
-  .header-service-name {
-    font-size: 10px;
-  }
-  
-  .header-page-number {
-    font-size: 10px;
-  }
-  
+  .header-service-name,
+  .header-page-number,
   .header-clock {
-    font-size: 10px;
+    font-size: 8px;
   }
   
   .content-area {
-    padding: 8px;
-    font-size: 10px;
+    padding: 4px 8px;
+    font-size: 8px;
   }
   
   .navigation-bar {
-    padding: 8px;
+    height: 58px;
+    min-height: 58px;
+    max-height: 58px;
+    padding: 4px 6px;
+    gap: 3px;
   }
   
-  /* Stack navigation elements */
   .fastext-bar {
-    flex-wrap: wrap;
     gap: 4px;
   }
   
   .fastext-button {
-    flex: 1 1 45%;
-    min-width: 60px;
-    padding: 12px 8px;
-    font-size: 9px;
-    /* Touch-friendly targets */
-    min-height: 44px;
+    min-width: 44px;
+    padding: 4px 6px;
+    font-size: 6px;
   }
   
   .page-nav-bar {
-    flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
   }
   
   .nav-arrow {
-    padding: 12px;
-    min-width: 44px;
-    min-height: 44px;
-    font-size: 12px;
+    padding: 3px 6px;
+    font-size: 6px;
   }
   
   .page-input {
-    font-size: 12px;
-    padding: 10px;
-    min-height: 44px;
-  }
-}
-
-/* Very small screens */
-@media (max-width: 480px) {
-  .teletext-screen {
-    font-size: 10px;
-    border-radius: 8px;
-  }
-  
-  .content-area {
-    padding: 6px;
-  }
-  
-  .fastext-button {
-    font-size: 8px;
-    padding: 10px 6px;
+    font-size: 7px;
+    padding: 3px;
+    width: 4ch;
   }
 }
 
@@ -657,8 +784,8 @@ body {
   }
   
   .header-bar {
-    background: #eee;
-    color: black;
+    background: #FFFFFF; /* Teletext White for print */
+    color: #000000; /* Teletext Black */
   }
   
   /* Add print header */
@@ -667,7 +794,7 @@ body {
     display: block;
     font-size: 12pt;
     margin-bottom: 20px;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #000000;
     padding-bottom: 10px;
   }
   
@@ -677,7 +804,7 @@ body {
     display: block;
     margin-top: 20px;
     font-size: 10pt;
-    color: gray;
+    color: #000000; /* Teletext Black */
   }
 }
 
@@ -743,3 +870,276 @@ body {
 .mb-sm { margin-bottom: 8px; }
 .mb-md { margin-bottom: 16px; }
 .mb-lg { margin-bottom: 24px; }
+
+
+/* ============================================
+   BOOT SCREEN STYLES (Req 1.1-1.10)
+   ============================================ */
+
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--tt-black, #000000);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* CRT screen curvature effect (Req 1.10) */
+  border-radius: 20px;
+  box-shadow: 
+    inset 0 0 100px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(255, 255, 0, 0.1);
+}
+
+/* CRT warm-up line (Req 1.2) */
+.boot-screen .crt-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--tt-white, #FFFFFF);
+  transform: scaleY(0);
+  transform-origin: center;
+  box-shadow: 
+    0 0 10px var(--tt-white, #FFFFFF),
+    0 0 20px var(--tt-white, #FFFFFF);
+}
+
+/* Static noise effect (Req 1.3) */
+.boot-static {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 1px,
+      rgba(255, 255, 255, 0.05) 2px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 1px,
+      rgba(255, 255, 255, 0.05) 2px
+    );
+  animation: boot-static-noise 0.05s steps(10) infinite;
+}
+
+@keyframes boot-static-noise {
+  0% { background-position: 0 0, 0 0; }
+  25% { background-position: 3px 2px, -2px 3px; }
+  50% { background-position: -2px -3px, 3px -2px; }
+  75% { background-position: 2px 3px, -3px 2px; }
+  100% { background-position: -3px -2px, 2px -3px; }
+}
+
+/* Boot content container */
+.boot-content {
+  position: relative;
+  z-index: 20;
+  text-align: center;
+  opacity: 0;
+}
+
+/* Boot title (Req 1.4) */
+.boot-title {
+  color: var(--tt-yellow, #FFFF00);
+  font-family: var(--font-primary, 'Press Start 2P', monospace);
+  font-size: var(--font-size-base, 14px);
+  margin-bottom: 32px;
+  min-height: 2em;
+  text-shadow: 
+    0 0 4px var(--tt-yellow, #FFFF00),
+    0 0 8px rgba(255, 255, 0, 0.5);
+}
+
+/* Boot subtitle (Req 1.5) */
+.boot-subtitle {
+  color: var(--tt-white, #FFFFFF);
+  font-family: var(--font-primary, 'Press Start 2P', monospace);
+  font-size: var(--font-size-small, 12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+#boot-subtitle-text {
+  opacity: 0;
+}
+
+/* Blinking cursor (Req 1.5) */
+.boot-cursor {
+  color: var(--tt-white, #FFFFFF);
+  opacity: 0;
+  animation: none; /* Controlled by GSAP */
+}
+
+/* Skip intro button (Req 1.8, 1.9) */
+.skip-intro-button {
+  position: absolute;
+  bottom: 32px;
+  right: 32px;
+  z-index: 30;
+  background: transparent;
+  border: 2px solid var(--tt-cyan, #00FFFF);
+  color: var(--tt-cyan, #00FFFF);
+  font-family: var(--font-primary, 'Press Start 2P', monospace);
+  font-size: var(--font-size-small, 12px);
+  padding: 12px 16px;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.15s ease-out;
+}
+
+.skip-intro-button:hover {
+  background: var(--tt-cyan, #00FFFF);
+  color: var(--tt-black, #000000);
+  box-shadow: 0 0 8px var(--tt-cyan, #00FFFF);
+}
+
+.skip-intro-button:focus-visible {
+  outline: 2px dotted var(--tt-cyan, #00FFFF);
+  outline-offset: 4px;
+}
+
+/* Responsive boot screen */
+@media (max-width: 768px) {
+  .boot-title {
+    font-size: 12px;
+  }
+  
+  .boot-subtitle {
+    font-size: 10px;
+  }
+  
+  .skip-intro-button {
+    bottom: 16px;
+    right: 16px;
+    font-size: 10px;
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .boot-title {
+    font-size: 10px;
+  }
+  
+  .boot-subtitle {
+    font-size: 8px;
+  }
+  
+  .skip-intro-button {
+    font-size: 8px;
+    padding: 8px 10px;
+  }
+}
+
+/* ============================================
+   TIME TRAVEL ANIMATION STYLES
+   Requirements: 11.1-11.10, 25.4
+   ============================================ */
+
+.time-travel-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--tt-black, #000000);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  /* CRT screen curvature effect */
+  border-radius: 20px;
+  box-shadow: 
+    inset 0 0 100px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(255, 0, 255, 0.2);
+}
+
+/* White flash overlay (Req 11.2) */
+.time-travel-flash {
+  position: absolute;
+  inset: 0;
+  background: var(--tt-white, #FFFFFF);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Time travel content container */
+.time-travel-content {
+  position: relative;
+  z-index: 20;
+  text-align: center;
+  opacity: 0;
+}
+
+/* "TRAVELING TO..." text (Req 11.4) */
+.time-travel-text {
+  color: var(--tt-magenta, #FF00FF);
+  font-family: var(--font-primary, 'Press Start 2P', monospace);
+  font-size: var(--font-size-base, 14px);
+  margin-bottom: 24px;
+  min-height: 2em;
+  text-shadow: 
+    0 0 4px var(--tt-magenta, #FF00FF),
+    0 0 8px rgba(255, 0, 255, 0.5);
+}
+
+/* Year counter display (Req 11.3) */
+.time-travel-year {
+  color: var(--tt-cyan, #00FFFF);
+  font-family: var(--font-primary, 'Press Start 2P', monospace);
+  font-size: calc(var(--font-size-base, 14px) * 2);
+  min-height: 2em;
+  text-shadow: 
+    0 0 6px var(--tt-cyan, #00FFFF),
+    0 0 12px rgba(0, 255, 255, 0.5),
+    0 0 20px rgba(0, 255, 255, 0.3);
+  /* Double-height effect for large year display */
+  transform: scaleY(1.5);
+  transform-origin: center;
+}
+
+/* Responsive time travel overlay */
+@media (max-width: 768px) {
+  .time-travel-text {
+    font-size: 12px;
+  }
+  
+  .time-travel-year {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .time-travel-text {
+    font-size: 10px;
+  }
+  
+  .time-travel-year {
+    font-size: 16px;
+  }
+}
+
+/* Reduced motion support (Req 25.10) */
+@media (prefers-reduced-motion: reduce) {
+  .time-travel-overlay {
+    transition: opacity 0.3s ease;
+  }
+  
+  .time-travel-year {
+    /* Disable rapid year counter animation */
+    transition: none;
+  }
+}
+

@@ -82,22 +82,22 @@ body {
 /* Page Titles - Double-height, yellow, centered (Req 29.1) */
 .title,
 .double-height {
-  transform: scaleY(2);
+  transform: scaleY(1.5);
   transform-origin: top;
-  line-height: 1;
+  line-height: 1.2;
   color: var(--tt-yellow);
   text-align: center;
-  margin-bottom: 1em;
+  margin-bottom: 0.5em;
 }
 
-/* Section Headers - 1.5x height, cyan, uppercase (Req 29.2) */
+/* Section Headers - 1.3x height, cyan, uppercase (Req 29.2) */
 .section-header {
-  transform: scaleY(1.5);
+  transform: scaleY(1.2);
   transform-origin: top;
   text-transform: uppercase;
   color: var(--tt-cyan);
-  line-height: 1;
-  margin-bottom: 0.5em;
+  line-height: 1.1;
+  margin-bottom: 0.3em;
 }
 
 /* Section header underline */
@@ -340,3 +340,83 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+
+/* ============================================
+   FORM ELEMENTS - TELETEXT STYLE
+   ============================================ */
+
+/* Teletext-styled select dropdowns */
+.teletext-select {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-small);
+  color: var(--tt-cyan);
+  background-color: var(--tt-black);
+  border: 2px solid var(--tt-cyan);
+  padding: 6px 8px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  outline: none;
+}
+
+.teletext-select:hover {
+  border-color: var(--tt-yellow);
+  color: var(--tt-yellow);
+}
+
+.teletext-select:focus {
+  border-color: var(--tt-yellow);
+  box-shadow: 0 0 8px var(--tt-cyan);
+  outline: 2px dotted var(--tt-cyan);
+  outline-offset: 2px;
+}
+
+.teletext-select option {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-small);
+  color: var(--tt-cyan);
+  background-color: var(--tt-black);
+  padding: 4px;
+}
+
+.teletext-select option:hover,
+.teletext-select option:checked {
+  background-color: var(--tt-cyan);
+  color: var(--tt-black);
+}
+
+/* Time Travel Button special styling */
+.time-travel-button {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  padding: 10px 20px;
+  border: 2px solid var(--tt-green);
+  background-color: var(--tt-green);
+  color: var(--tt-black);
+  cursor: pointer;
+  transition: all 0.15s ease-out;
+}
+
+.time-travel-button:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 12px var(--tt-green);
+  transform: scale(1.02);
+}
+
+.time-travel-button:active {
+  transform: scale(0.95);
+}
+
+/* Quick jump items */
+.quick-jump-item {
+  cursor: pointer;
+  transition: color 0.15s ease-out;
+}
+
+.quick-jump-item:hover {
+  color: var(--tt-yellow) !important;
+  text-decoration: underline;
+}
+

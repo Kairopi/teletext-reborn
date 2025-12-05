@@ -13,30 +13,51 @@
 
 .tv-bezel {
   position: relative;
-  padding: 10px;
+  padding: 12px;
   background: linear-gradient(
     145deg,
-    #3a3a3a 0%,
-    #2a2a2a 50%,
-    #1a1a1a 100%
+    #4a4a4a 0%,
+    #2d2d2d 30%,
+    #1a1a1a 70%,
+    #0d0d0d 100%
   );
-  border-radius: 24px;
+  border-radius: 20px;
   box-shadow: 
     /* Outer shadow for depth */
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    /* Inner highlight */
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    /* Inner shadow */
-    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    0 12px 40px rgba(0, 0, 0, 0.6),
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    /* Inner highlight - top edge */
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    /* Inner shadow - bottom edge */
+    inset 0 -3px 6px rgba(0, 0, 0, 0.4);
+  
+  /* ========================================
+     FIXED VIEWPORT - TV BEZEL FRAME
+     Premium compact TV case - NEVER resizes
+     ======================================== */
+  width: 100%;
+  max-width: 660px;
+  
+  /* CRITICAL: Nothing escapes the bezel */
+  overflow: hidden;
+  
+  /* Prevent any flex/grid parent from resizing this */
+  flex-shrink: 0;
+  flex-grow: 0;
+  
+  /* Ensure this is a containing block */
+  contain: layout;
 }
 
 /* Inner shadow for recessed screen (Req 24.6) */
 .tv-bezel::before {
   content: '';
   position: absolute;
-  inset: 8px;
-  border-radius: 20px;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+  inset: 10px;
+  border-radius: 14px;
+  box-shadow: 
+    inset 0 0 30px rgba(0, 0, 0, 0.9),
+    inset 0 0 10px rgba(0, 0, 0, 0.5);
   pointer-events: none;
   z-index: 1;
 }
@@ -45,20 +66,22 @@
 .tv-bezel::after {
   content: '';
   position: absolute;
-  bottom: 12px;
-  right: 20px;
-  width: 6px;
-  height: 6px;
+  bottom: 8px;
+  right: 16px;
+  width: 5px;
+  height: 5px;
   background: var(--tt-green, #00FF00);
   border-radius: 50%;
-  box-shadow: 0 0 4px var(--tt-green, #00FF00);
+  box-shadow: 
+    0 0 3px var(--tt-green, #00FF00),
+    0 0 6px var(--tt-green, #00FF00);
   animation: led-pulse 2s ease-in-out infinite;
   z-index: 20;
 }
 
 @keyframes led-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%, 100% { opacity: 1; box-shadow: 0 0 3px var(--tt-green, #00FF00), 0 0 6px var(--tt-green, #00FF00); }
+  50% { opacity: 0.7; box-shadow: 0 0 2px var(--tt-green, #00FF00); }
 }
 
 /* ============================================
@@ -466,3 +489,25 @@
 
 .no-aberration .rgb-separation,
 .no-aberration .chromatic-aberration { text-shadow: none; }
+
+/* ============================================
+   RESPONSIVE TV BEZEL
+   Scales elegantly while maintaining proportions
+   ============================================ */
+
+/* Tablet */
+@media (max-width: 720px) {
+  .tv-bezel {
+    max-width: 100%;
+    padding: 10px;
+    border-radius: 16px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .tv-bezel {
+    padding: 8px;
+    border-radius: 12px;
+  }
+}

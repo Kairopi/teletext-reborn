@@ -9,7 +9,13 @@ Build an **AAA-quality web experience** that creates genuine delight and nostalg
 ## Core Features
 
 - **Live Mode**: Real-time news, weather, and cryptocurrency data in authentic Teletext style
-- **Time Machine**: Explore historical events and weather for any date (1940-present)
+- **Enhanced Time Machine**: History.com-inspired "Today in History" experience with:
+  - Simplified date selection (month/day only, defaults to TODAY)
+  - Featured "Event of the Day" highlights
+  - Holiday banners and celebrations
+  - 50+ events, 25 births, 15 deaths per date
+  - Event detail pages with full descriptions and Wikipedia links
+  - Category tabs with pagination
 - **Authentic Design**: Premium CRT effects, scanlines, 8-color palette, blocky fonts
 - **GSAP Animations**: Cinematic boot sequence, page transitions, time travel effect
 
@@ -30,9 +36,11 @@ The only Teletext revival combining LIVE modern data with historical "Time Machi
 | 101-109 | News | Top Stories, World, Tech, Business, Sports |
 | 200-209 | Weather | Current conditions, 5-day forecast |
 | 300-309 | Finance | Cryptocurrency prices |
-| 500 | Time Machine | Date selection, quick jumps |
-| 501 | Historical Events | On This Day from Wikipedia |
+| 500 | Time Machine | Simplified date picker (month/day), quick jumps |
+| 501 | Today in History | Featured event, category tabs, paginated events |
 | 502 | Historical Weather | Weather on selected date |
+| 503 | Event Detail | Full event description, Wikipedia link |
+| 504 | Timeline View | Events by century (future) |
 | 888 | Easter Egg | Teletext fun facts |
 | 900 | Settings | User preferences |
 | 999 | About | Credits and history |

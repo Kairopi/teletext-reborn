@@ -563,3 +563,51 @@ The project targets the "Resurrection" category of the hackathon, bringing dead 
 6. WHEN a user completes settings setup THEN the System SHALL display "All set! Enjoy your personalized Teletext" message
 7. WHEN a user returns after 7+ days THEN the System SHALL display "Welcome back! We missed you" message on home page
 
+
+
+### Requirement 34: Enhanced Time Machine - "Today in History" Experience
+
+**User Story:** As a user, I want a rich, History.com-inspired "Today in History" experience, so that I can explore historical events in an engaging and detailed way without needing to specify a year.
+
+#### Acceptance Criteria
+
+1. WHEN the Time Machine page (500) loads THEN the System SHALL default to TODAY's date (current month and day)
+2. WHEN selecting a date THEN the System SHALL only require month and day selection (no year needed, like History.com)
+3. WHEN displaying the date picker THEN the System SHALL show a large, prominent display of the selected date (e.g., "DECEMBER 5")
+4. WHEN the user clicks "EXPLORE THIS DAY" THEN the System SHALL navigate to the Overview page (501) with a smooth transition animation
+5. WHEN displaying the Overview page (501) THEN the System SHALL show:
+   - Featured "Event of the Day" highlight with full description
+   - Holiday banner if the date has associated holidays
+   - Category tabs with counts: Events (50), Births (25), Deaths (15), Holidays
+   - Paginated list of events (8 items per page)
+6. WHEN displaying events THEN the System SHALL show year and description for each event, color-coded by type (cyan for events, green for births, red for deaths)
+7. WHEN a user clicks on an event THEN the System SHALL navigate to the Event Detail page (503) showing:
+   - Full event description with word wrapping
+   - Year prominently displayed in double-height text
+   - Related Wikipedia article title and description
+   - Direct link to Wikipedia for more information
+   - Previous/Next navigation between events
+8. WHEN displaying the Event Detail page THEN the System SHALL provide navigation to return to the Overview list
+9. WHEN the user's birthday is set in settings THEN the System SHALL show "★ YOUR BIRTHDAY" as the first quick jump option
+10. WHEN displaying quick jumps THEN the System SHALL include famous dates: Moon Landing (Jul 20), Berlin Wall (Nov 9), New Year's Day (Jan 1), Valentine's Day (Feb 14), Halloween (Oct 31), Christmas (Dec 25)
+11. WHEN the "RANDOM" Fastext button is pressed THEN the System SHALL select a random month and day
+12. WHEN the "TODAY" Fastext button is pressed THEN the System SHALL reset to the current date
+13. WHEN fetching data THEN the System SHALL retrieve up to 50 events, 25 births, 15 deaths, and 10 holidays from Wikipedia API
+14. WHEN displaying loading state THEN the System SHALL show "LOADING HISTORY..." with animated progress bar
+15. WHEN an error occurs THEN the System SHALL display error message with RETRY and HOME buttons
+
+### Requirement 35: Enhanced Wikipedia API Integration
+
+**User Story:** As a user, I want accurate and detailed historical information, so that I can learn about events with confidence.
+
+#### Acceptance Criteria
+
+1. WHEN fetching "On This Day" data THEN the System SHALL use the Wikipedia API endpoint: `https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/all/{month}/{day}`
+2. WHEN parsing events THEN the System SHALL extract: year, description, full description, Wikipedia URL, page title, page description, and thumbnail URL
+3. WHEN displaying events THEN the System SHALL show the full description (not truncated) on the detail page
+4. WHEN a Wikipedia link is available THEN the System SHALL make it clickable and open in a new tab
+5. WHEN caching data THEN the System SHALL cache responses for 24 hours to reduce API calls
+6. WHEN the API returns holidays THEN the System SHALL parse and display them in a dedicated "Holidays" category
+7. WHEN selecting a "Featured Event" THEN the System SHALL prioritize events from the "selected" category if available, otherwise use the first event
+8. WHEN displaying event counts THEN the System SHALL show accurate totals for each category in the tab labels
+

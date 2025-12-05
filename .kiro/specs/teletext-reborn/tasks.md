@@ -84,72 +84,130 @@ This implementation plan transforms the Teletext Reborn design into actionable c
 
 ## Phase 2: Core Application Infrastructure
 
-- [ ] 4. Implement state management (src/js/state.js)
-  - [ ] 4.1 Create StateManager class
+- [x] 4. Implement state management (src/js/state.js)
+
+
+
+
+
+
+  - [x] 4.1 Create StateManager class
+
     - Implement settings storage and retrieval
     - Implement Time Machine date state
     - Implement cache management with TTL
     - _Requirements: 12.4, 12.5, 14.2, 14.3_
-  - [ ] 4.2 Write property test for settings persistence
+
+  - [x] 4.2 Write property test for settings persistence
+
 
     - **Property 3: Settings Persistence**
     - Verify save/load round-trip returns identical settings
     - **Validates: Requirements 12.4, 12.5**
 
 
-  - [ ]* 4.3 Write property test for cache validity
+
+  - [x] 4.3 Write property test for cache validity
+
+
     - **Property 4: Cache Validity**
     - Verify cached data is returned when TTL not expired
     - **Validates: Requirements 14.2, 14.3**
 
-- [ ] 5. Implement page router (src/js/router.js)
-  - [ ] 5.1 Create PageRouter class
+- [x] 5. Implement page router (src/js/router.js)
+
+
+
+
+
+  - [x] 5.1 Create PageRouter class
+
+
+
     - Implement navigate(pageNumber) method
     - Implement getCurrentPage() method
     - Implement goBack/goForward navigation
     - Implement keyboard shortcuts (1-9, 0, arrows, Escape)
     - _Requirements: 3.1-3.7, 19.1-19.4_
-  - [ ]* 5.2 Write property test for navigation consistency
+  - [x] 5.2 Write property test for navigation consistency
+
+
+
     - **Property 2: Page Navigation Consistency**
     - Verify navigate then back returns to original page
     - **Validates: Requirements 3.1, 3.4**
-  - [ ]* 5.3 Write property test for invalid page handling
+  - [x] 5.3 Write property test for invalid page handling
+
+
     - **Property 8: API Error Handling**
     - Verify invalid page numbers show error without crashing
     - **Validates: Requirements 3.5, 15.1**
 
-- [ ] 6. Implement Teletext utilities (src/js/utils/teletext.js)
-  - [ ] 6.1 Create text formatting utilities
+- [x] 6. Implement Teletext utilities (src/js/utils/teletext.js)
+
+
+
+
+
+  - [x] 6.1 Create text formatting utilities
+
+
     - Implement truncateToWidth(text, maxWidth=40) function
     - Implement formatDottedLeader(label, value, width=40) function
     - Implement wrapText(text, maxWidth=40) function
     - _Requirements: 2.10, 5.6_
-  - [ ]* 6.2 Write property test for line width constraint
+
+  - [x] 6.2 Write property test for line width constraint
+
+
     - **Property 7: Line Width Constraint**
     - Verify no formatted line exceeds 40 characters
     - **Validates: Requirements 2.10, 5.6**
 
-- [ ] 7. Implement date utilities (src/js/utils/date.js)
-  - [ ] 7.1 Create date validation and formatting
+- [x] 7. Implement date utilities (src/js/utils/date.js)
+
+
+
+
+
+  - [x] 7.1 Create date validation and formatting
+
+
     - Implement isValidDate(month, day, year) function
     - Implement isInValidRange(date) function (1940-yesterday)
     - Implement formatTeletextDate(date) function
     - Implement formatTimestamp(date) function
     - _Requirements: 8.3, 8.4_
-  - [ ]* 7.2 Write property test for date validation
+
+  - [x] 7.2 Write property test for date validation
+
+
+
     - **Property 5: Date Validation**
     - Verify date validation correctly identifies valid/invalid dates
     - **Validates: Requirements 8.3, 8.4**
 
-- [ ] 8. Checkpoint - Verify core infrastructure
+- [x] 8. Checkpoint - Verify core infrastructure
+
+
+
+
+
   - Ensure all tests pass, ask the user if questions arise.
 
 ---
 
 ## Phase 3: Animation System
 
-- [ ] 9. Implement boot sequence animation (src/js/animations/boot.js)
-  - [ ] 9.1 Create boot sequence GSAP timeline
+- [x] 9. Implement boot sequence animation (src/js/animations/boot.js)
+
+
+
+
+
+  - [x] 9.1 Create boot sequence GSAP timeline
+
+
     - Phase 1: Black screen (200ms)
     - Phase 2: CRT warm-up line expansion (500ms)
     - Phase 3: Static noise effect (300-500ms)
@@ -157,176 +215,319 @@ This implementation plan transforms the Teletext Reborn design into actionable c
     - Phase 5: Subtitle fade with blinking cursor
     - Total duration: 3 seconds maximum
     - _Requirements: 1.1-1.10, 25.2, 25.3_
-  - [ ] 9.2 Implement skip intro functionality
+
+  - [x] 9.2 Implement skip intro functionality
+
     - Check localStorage for returning user
     - Show "Skip Intro" button after 500ms
     - Fade to home on skip
     - _Requirements: 1.8, 1.9_
 
-- [ ] 10. Implement page transitions (src/js/animations/transitions.js)
-  - [ ] 10.1 Create page transition GSAP timelines
+- [x] 10. Implement page transitions (src/js/animations/transitions.js)
+
+
+
+
+
+
+  - [x] 10.1 Create page transition GSAP timelines
+
     - Implement fade transition (0.3-0.4s)
     - Implement slide transition (horizontal for prev/next)
     - Implement static flash between pages (50ms)
     - Implement content line stagger effect (0.03s delay)
     - _Requirements: 3.6, 31.1-31.10, 25.1_
 
-- [ ] 11. Implement time travel animation (src/js/animations/timeTravel.js)
-  - [ ] 11.1 Create time travel GSAP timeline (2.5s total)
+- [x] 11. Implement time travel animation (src/js/animations/timeTravel.js)
+
+
+
+
+
+  - [x] 11.1 Create time travel GSAP timeline (2.5s total)
+
+
     - Phase 1: Blur and brighten (0-0.3s)
     - Phase 2: White flash with screen shake (0.3-0.5s)
     - Phase 3: Year counter animation (0.5-2.0s)
     - Phase 4: Unblur and reveal content (2.0-2.5s)
     - Implement "TRAVELING TO..." typewriter text
     - _Requirements: 11.1-11.10, 25.4_
-  - [ ] 11.2 Implement reverse time travel animation
+
+  - [x] 11.2 Implement reverse time travel animation
+
     - Count years forward from historical to current
     - Display "RETURNING TO PRESENT..." message
     - _Requirements: 11.7, 11.8_
 
-- [ ] 12. Implement micro-interactions (src/js/animations/effects.js)
-  - [ ] 12.1 Create hover and click effects
+- [x] 12. Implement micro-interactions (src/js/animations/effects.js)
+
+
+
+
+
+
+  - [x] 12.1 Create hover and click effects
+
     - Button hover: brightness 1.2, glow, underline slide
     - Button click: scale 0.95 for 100ms
     - Menu item hover: cyan color, ► prefix animation
     - Clickable text flicker effect
     - Navigation arrow scale 1.2x
     - _Requirements: 20.3, 20.4, 27.1-27.10_
-  - [ ] 12.2 Create feedback animations
+
+  - [x] 12.2 Create feedback animations
+
+
+
+
+
     - Success flash (green border 300ms)
     - Error shake (translateX ±3px, 3 cycles)
     - Loading cursor blink (530ms)
+
     - _Requirements: 27.7, 27.8, 20.1, 20.2_
-  - [ ] 12.3 Implement idle screen flicker
+  - [x] 12.3 Implement idle screen flicker
+
+
+
+
+
     - Trigger after 30 seconds idle
     - Opacity 0.97-1.0 every 3-5 seconds
     - _Requirements: 2.9_
 
-- [ ] 13. Checkpoint - Verify animation system
+- [x] 13. Checkpoint - Verify animation system
+
+
+
+
+
   - Ensure all tests pass, ask the user if questions arise.
 
 ---
 
 ## Phase 4: UI Components
 
-- [ ] 14. Implement TeletextScreen component (src/js/app.js)
-  - [ ] 14.1 Create main screen container
+- [x] 14. Implement TeletextScreen component (src/js/app.js)
+
+
+
+
+
+
+  - [x] 14.1 Create main screen container
+
     - Render header bar with service name, page number, clock
     - Render content area with 40x22 grid
     - Render navigation bar with Fastext buttons
     - Apply all CRT effects as overlays
     - _Requirements: 0.1-0.8_
-  - [ ] 14.2 Implement live clock
+
+  - [x] 14.2 Implement live clock
+
     - Update every second in HH:MM:SS format
     - Animate digit changes
     - _Requirements: 2.6, 32.7_
-  - [ ] 14.3 Implement page number input
+
+
+  - [x] 14.3 Implement page number input
+
+
+
+
+
     - 3-digit input field
     - Accept only numeric input
     - Navigate on Enter or 3 digits entered
     - _Requirements: 0.5_
 
-- [ ] 15. Implement Fastext navigation bar
-  - [ ] 15.1 Create Fastext button component
+- [x] 15. Implement Fastext navigation bar
+
+
+
+
+
+  - [x] 15.1 Create Fastext button component
+
+
     - Four colored buttons (Red, Green, Yellow, Cyan)
     - Context-dependent labels per page
     - Hover effects with underline animation
     - _Requirements: 0.4, 2.7_
-  - [ ] 15.2 Implement prev/next navigation
+  - [x] 15.2 Implement prev/next navigation
+
+
     - Previous and Next buttons with arrows
     - Keyboard arrow key support
     - _Requirements: 3.4_
 
-- [ ] 16. Implement loading states
-  - [ ] 16.1 Create loading indicator components
+- [x] 16. Implement loading states
+
+
+
+
+
+  - [x] 16.1 Create loading indicator components
+
+
     - Block progress bar: ░░░░░░░░░░ → ██████████
     - Animated dots: LOADING. → LOADING.. → LOADING...
     - Rotating spinner: ◐ → ◓ → ◑ → ◒
     - Blinking cursor
     - _Requirements: 20.1, 20.2, 26.1-26.8_
-  - [ ] 16.2 Implement extended loading states
+
+  - [x] 16.2 Implement extended loading states
+
+
     - "STILL LOADING - PLEASE WAIT" after 3 seconds
     - "READY" flash in green on completion
     - _Requirements: 26.7, 26.8_
 
-- [ ] 17. Implement error states
-  - [ ] 17.1 Create error display component
+- [x] 17. Implement error states
+
+
+  - [x] 17.1 Create error display component
     - Error message with ⚠ prefix
     - Red border with shake animation
     - Retry button
     - _Requirements: 15.1-15.5_
-  - [ ] 17.2 Create Page Not Found (404) page
+  - [x] 17.2 Create Page Not Found (404) page
     - Humorous Teletext-style message
     - Navigation options to return home
     - _Requirements: 3.5, 18.5_
 
-- [ ] 18. Checkpoint - Verify UI components
-  - Ensure all tests pass, ask the user if questions arise.
+- [x] 18. Checkpoint - Verify UI components
+  - All 352 tests passing
+  - UI components verified: TeletextScreen, Fastext navigation, loading states, error states
+  - Screen layout: 800×600px fixed (4:3 aspect ratio)
+  - Navigation bar pinned at bottom, content area scrollable
+  - All CRT effects implemented and working
 
 ---
 
 ## Phase 5: API Services
 
-- [ ] 19. Implement base API utilities (src/js/services/api.js)
-  - [ ] 19.1 Create fetch wrapper with error handling
+- [x] 19. Implement base API utilities (src/js/services/api.js)
+
+
+
+
+
+
+  - [x] 19.1 Create fetch wrapper with error handling
+
     - Implement retry logic (3 attempts)
     - Implement timeout handling
     - Integrate with cache layer
     - _Requirements: 14.2, 15.1, 15.2_
 
-- [ ] 20. Implement Weather API service (src/js/services/weatherApi.js)
-  - [ ] 20.1 Implement current weather fetching
+- [x] 20. Implement Weather API service (src/js/services/weatherApi.js)
+
+
+
+
+
+
+  - [x] 20.1 Implement current weather fetching
+
     - Integrate Open-Meteo API
     - Parse temperature, conditions, humidity, wind
     - Cache for 15 minutes
     - _Requirements: 6.1-6.7_
-  - [ ] 20.2 Implement historical weather fetching
+
+  - [x] 20.2 Implement historical weather fetching
     - Integrate Open-Meteo Archive API
     - Handle dates before 1940 gracefully
+
     - _Requirements: 10.1-10.5_
-  - [ ]* 20.3 Write property test for historical weather range
+  - [x] 20.3 Write property test for historical weather range
+
     - **Property 6: Historical Weather Data Range**
     - Verify dates after 1940 return valid data
     - **Validates: Requirements 10.1, 10.3**
 
-- [ ] 21. Implement Wikipedia API service (src/js/services/wikipediaApi.js)
-  - [ ] 21.1 Implement "On This Day" fetching
+- [x] 21. Implement Wikipedia API service (src/js/services/wikipediaApi.js)
+
+
+
+
+
+
+
+
+  - [x] 21.1 Implement "On This Day" fetching
+
+
+
+
+
+
     - Integrate Wikipedia On This Day API
     - Parse events, births, deaths
     - Cache for 24 hours
     - _Requirements: 9.1-9.7_
 
-- [ ] 22. Implement News API service (src/js/services/newsApi.js)
-  - [ ] 22.1 Implement news fetching
+- [x] 22. Implement News API service (src/js/services/newsApi.js)
+
+
+
+
+
+
+  - [x] 22.1 Implement news fetching
+
     - Integrate NewsData.io API
     - Parse headlines by category
     - Cache for 5 minutes
     - Handle rate limits gracefully
     - _Requirements: 5.1-5.7_
 
-- [ ] 23. Implement Finance API service (src/js/services/financeApi.js)
-  - [ ] 23.1 Implement crypto price fetching
-    - Integrate CoinGecko API
+- [x] 23. Implement Finance API service (src/js/services/financeApi.js)
+
+
+
+  - [x] 23.1 Implement crypto price fetching
+
+    - Integrate Coinlore API (FREE, no API key required)
     - Parse top 7 cryptocurrencies
     - Cache for 1 minute
     - Handle rate limits with cached data notice
     - _Requirements: 7.1-7.7_
 
-- [ ] 24. Implement Geolocation service (src/js/services/geoApi.js)
-  - [ ] 24.1 Implement IP-based location detection
+- [x] 24. Implement Geolocation service (src/js/services/geoApi.js)
+
+
+
+
+
+
+  - [x] 24.1 Implement IP-based location detection
+
     - Integrate IP-API
     - Return city, lat, lon
     - _Requirements: 6.1, 12.3_
 
-- [ ] 25. Checkpoint - Verify API services
+- [x] 25. Checkpoint - Verify API services
+
+
+
+
   - Ensure all tests pass, ask the user if questions arise.
 
 ---
 
 ## Phase 6: Page Implementations
 
-- [ ] 26. Implement Home Page (src/js/pages/home.js) - Page 100
-  - [ ] 26.1 Create home page layout
+- [x] 26. Implement Home Page (src/js/pages/home.js) - Page 100
+
+
+
+
+
+  - [x] 26.1 Create home page layout
+
+
     - Double-height "★ TELETEXT REBORN ★" title
     - Current date display
     - Welcome message
@@ -334,50 +535,77 @@ This implementation plan transforms the Teletext Reborn design into actionable c
     - Mini weather widget
     - Rotating tips section
     - _Requirements: 4.1-4.10_
-  - [ ] 26.2 Implement menu item stagger animation
+
+
+  - [x] 26.2 Implement menu item stagger animation
+
     - GSAP stagger with 0.1s delay between items
     - _Requirements: 4.7_
 
-- [ ] 27. Implement News Pages (src/js/pages/news.js) - Pages 101-109
-  - [ ] 27.1 Create news page layout
+- [x] 27. Implement News Pages (src/js/pages/news.js) - Pages 101-109
+  - [x] 27.1 Create news page layout
     - Headlines with source and time
     - Category navigation (Top, World, Tech, Business, Sports)
     - Auto-refresh every 5 minutes
     - _Requirements: 5.1-5.7_
 
-- [ ] 28. Implement Weather Pages (src/js/pages/weather.js) - Pages 200-209
-  - [ ] 28.1 Create weather page layout
+- [x] 28. Implement Weather Pages (src/js/pages/weather.js) - Pages 200-209
+
+
+
+
+
+
+
+
+
+  - [x] 28.1 Create weather page layout
+
+
     - Current conditions with ASCII art icons
     - 5-day forecast
     - Location display
+
     - Temperature unit toggle
     - _Requirements: 6.1-6.7_
-  - [ ] 28.2 Implement ASCII weather icons
+  - [x] 28.2 Implement ASCII weather icons
+
     - Sun, cloud, rain, snow, storm icons
     - Using block characters
     - _Requirements: 6.4_
 
-- [ ] 29. Implement Finance Pages (src/js/pages/finance.js) - Pages 300-309
-  - [ ] 29.1 Create finance page layout
+- [x] 29. Implement Finance Pages (src/js/pages/finance.js) - Pages 300-309
+
+
+
+
+
+
+  - [x] 29.1 Create finance page layout
+
     - Crypto prices with 24h change
     - Green/red color coding for changes
     - Right-aligned numbers
     - Last updated timestamp
     - _Requirements: 7.1-7.7_
 
-- [ ] 30. Implement Time Machine Pages (src/js/pages/timeMachine.js) - Pages 500-502
-  - [ ] 30.1 Create date selection page (500)
+- [x] 30. Implement Time Machine Pages (src/js/pages/timeMachine.js) - Pages 500-502
+
+  - [x] 30.1 Create date selection page (500)
     - Double-height "⏰ TIME MACHINE ⏰" title
     - Month/Day/Year dropdowns
     - Quick jump buttons for famous dates
     - "🚀 TIME TRAVEL" button
     - _Requirements: 8.1-8.11_
-  - [ ] 30.2 Create historical events page (501)
+
+  - [x] 30.2 Create historical events page (501)
     - Events, Births, Deaths sections
     - Wikipedia attribution
     - Birthday special banner
     - _Requirements: 9.1-9.7_
-  - [ ] 30.3 Create historical weather page (502)
+
+  - [x] 30.3 Create historical weather page (502)
+
     - Historical temperature data
     - Comparison to average
     - Data limitation messages for pre-1940
@@ -415,7 +643,8 @@ This implementation plan transforms the Teletext Reborn design into actionable c
     - Parse URLs on page load
     - Deep-link to Time Machine with date
     - _Requirements: 17.1-17.5_
-  - [ ]* 34.2 Write property test for URL round-trip
+  - [ ] 34.2 Write property test for URL round-trip
+
     - **Property: URL Sharing Round-Trip**
     - Verify generate URL then parse returns same date
     - **Validates: Requirements 17.2, 17.3**
