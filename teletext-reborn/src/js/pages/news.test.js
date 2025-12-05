@@ -59,8 +59,8 @@ vi.mock('../services/newsApi.js', () => ({
   }))),
   NEWS_CATEGORIES: {
     top: { page: 101, label: 'TOP STORIES', apiCategory: 'top' },
-    world: { page: 102, label: 'WORLD NEWS', apiCategory: 'world' },
-    technology: { page: 103, label: 'TECHNOLOGY', apiCategory: 'technology' },
+    world: { page: 102, label: 'WORLD', apiCategory: 'world' },
+    technology: { page: 103, label: 'TECH', apiCategory: 'technology' },
     business: { page: 104, label: 'BUSINESS', apiCategory: 'business' },
     sports: { page: 105, label: 'SPORTS', apiCategory: 'sports' },
   },
@@ -74,10 +74,12 @@ vi.mock('../services/newsApi.js', () => ({
   startAutoRefresh: vi.fn(() => vi.fn()),
   stopAutoRefresh: vi.fn(),
   isNewsPage: vi.fn((page) => page >= 101 && page <= 109),
+  isInDemoMode: vi.fn(() => false),
+  getLastError: vi.fn(() => null),
   getCategoryForPage: vi.fn((page) => {
     const categories = {
       101: { id: 'top', label: 'TOP STORIES', page: 101 },
-      102: { id: 'world', label: 'WORLD NEWS', page: 102 },
+      102: { id: 'world', label: 'WORLD', page: 102 },
       103: { id: 'technology', label: 'TECHNOLOGY', page: 103 },
       104: { id: 'business', label: 'BUSINESS', page: 104 },
       105: { id: 'sports', label: 'SPORTS', page: 105 },
@@ -240,10 +242,10 @@ describe('News Page', () => {
     
     it('should render different categories based on page number', () => {
       const html102 = render(102);
-      expect(html102).toContain('WORLD NEWS');
+      expect(html102).toContain('WORLD');
       
       const html103 = render(103);
-      expect(html103).toContain('TECHNOLOGY');
+      expect(html103).toContain('TECH');
       
       const html104 = render(104);
       expect(html104).toContain('BUSINESS');
@@ -409,8 +411,8 @@ describe('News Page', () => {
             
             const expectedLabels = {
               101: 'TOP STORIES',
-              102: 'WORLD NEWS',
-              103: 'TECHNOLOGY',
+              102: 'WORLD',
+              103: 'TECH',
               104: 'BUSINESS',
               105: 'SPORTS',
             };
