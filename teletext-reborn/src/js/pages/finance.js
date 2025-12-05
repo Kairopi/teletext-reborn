@@ -90,14 +90,14 @@ let animationTimeline = null;
  * @returns {string} HTML for loading state
  */
 function renderLoading() {
-  // Create 8 placeholder rows for the cryptos
+  // Create 8 placeholder rows for the cryptos as table rows
   const placeholderRows = Array(8).fill(0).map((_, index) => `
-    <div class="crypto-row placeholder-row" data-index="${index}" style="display: flex; align-items: center; padding: 4px 0; gap: 8px; border-bottom: 1px solid rgba(0,255,255,0.1);">
-      <span class="placeholder-block" style="color: var(--tt-cyan); width: 40px;">░░░░</span>
-      <span class="placeholder-block" style="color: var(--tt-white); width: 90px;">░░░░░░░░░</span>
-      <span class="placeholder-block" style="color: var(--tt-yellow); flex: 1; text-align: right;">░░░░░░░░░</span>
-      <span class="placeholder-block" style="color: var(--color-secondary-70); width: 70px; text-align: right;">░░░░░░</span>
-    </div>
+    <tr class="crypto-row placeholder-row" data-index="${index}">
+      <td class="placeholder-block" style="color: var(--tt-cyan); padding: 6px 4px;">░░░░</td>
+      <td class="placeholder-block" style="color: var(--tt-white); padding: 6px 4px;">░░░░░░░░</td>
+      <td class="placeholder-block" style="color: var(--tt-yellow); padding: 6px 4px; text-align: right;">░░░░░░░░</td>
+      <td class="placeholder-block" style="color: var(--color-secondary-70); padding: 6px 4px; text-align: right;">░░░░░░</td>
+    </tr>
   `).join('');
 
   return `
@@ -121,17 +121,27 @@ function renderLoading() {
           </div>
         </div>
         
-        <!-- Header Row -->
-        <div class="content-line header-row" style="display: flex; align-items: center; color: var(--tt-cyan); padding: 4px 0; gap: 8px; font-size: 0.9em; background: rgba(0,0,255,0.2);">
-          <span style="width: 40px;">COIN</span>
-          <span style="width: 90px;">NAME</span>
-          <span style="flex: 1; text-align: right;">PRICE (USD)</span>
-          <span style="width: 70px; text-align: right;">24H %</span>
-        </div>
-        
-        <!-- Placeholder Rows (Req 7.5) -->
-        <div class="crypto-list" style="margin-top: 4px;">
-          ${placeholderRows}
+        <!-- Placeholder Table (Req 7.5) -->
+        <div class="crypto-list">
+          <table class="crypto-table" style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.95em;">
+            <colgroup>
+              <col style="width: 15%;">
+              <col style="width: 30%;">
+              <col style="width: 30%;">
+              <col style="width: 25%;">
+            </colgroup>
+            <thead>
+              <tr style="background: rgba(0,0,255,0.2);">
+                <th style="color: var(--tt-cyan); padding: 6px 4px; text-align: left; font-weight: normal;">COIN</th>
+                <th style="color: var(--tt-cyan); padding: 6px 4px; text-align: left; font-weight: normal;">NAME</th>
+                <th style="color: var(--tt-cyan); padding: 6px 4px; text-align: right; font-weight: normal;">PRICE</th>
+                <th style="color: var(--tt-cyan); padding: 6px 4px; text-align: right; font-weight: normal;">24H</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${placeholderRows}
+            </tbody>
+          </table>
         </div>
       </div>
       
@@ -175,11 +185,11 @@ function renderError(message) {
 }
 
 /**
- * Render a single crypto row
+ * Render a single crypto row as a table row
  * Requirements: 7.2, 7.3, 7.4
  * @param {Object} crypto - Crypto data
  * @param {number} index - Row index
- * @returns {string} HTML for crypto row
+ * @returns {string} HTML for crypto table row
  */
 function renderCryptoRow(crypto, index) {
   const change = formatChange(crypto.change24h);
@@ -189,20 +199,20 @@ function renderCryptoRow(crypto, index) {
   const changeIcon = change.isPositive ? '▲' : change.isNegative ? '▼' : '─';
   
   return `
-    <div class="crypto-row" data-index="${index}" style="display: flex; align-items: center; padding: 4px 0; gap: 8px; border-bottom: 1px solid rgba(0,255,255,0.1);">
-      <span style="color: var(--tt-cyan); width: 40px; font-weight: bold;">${crypto.symbol}</span>
-      <span style="color: var(--tt-white); width: 90px;">${formatCryptoName(crypto.name, 11)}</span>
-      <span style="color: var(--tt-yellow); flex: 1; text-align: right; font-weight: bold;">${formatPrice(crypto.price)}</span>
-      <span style="color: ${changeColor}; width: 70px; text-align: right;">${changeIcon} ${change.text}</span>
-    </div>
+    <tr class="crypto-row" data-index="${index}">
+      <td style="color: var(--tt-cyan); padding: 6px 4px;">${crypto.symbol}</td>
+      <td style="color: var(--tt-white); padding: 6px 4px;">${formatCryptoName(crypto.name, 10)}</td>
+      <td style="color: var(--tt-yellow); padding: 6px 4px; text-align: right;">${formatPrice(crypto.price)}</td>
+      <td style="color: ${changeColor}; padding: 6px 4px; text-align: right;">${changeIcon} ${change.text}</td>
+    </tr>
   `;
 }
 
 /**
- * Render the crypto list
+ * Render the crypto list as a proper HTML table
  * Requirements: 7.2
  * @param {Array} cryptos - Array of crypto data
- * @returns {string} HTML for crypto list
+ * @returns {string} HTML for crypto table
  */
 function renderCryptoList(cryptos) {
   if (!cryptos || cryptos.length === 0) {
@@ -213,7 +223,29 @@ function renderCryptoList(cryptos) {
     `;
   }
   
-  return cryptos.map((crypto, index) => renderCryptoRow(crypto, index)).join('');
+  const rows = cryptos.map((crypto, index) => renderCryptoRow(crypto, index)).join('');
+  
+  return `
+    <table class="crypto-table" style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.95em;">
+      <colgroup>
+        <col style="width: 15%;">
+        <col style="width: 30%;">
+        <col style="width: 30%;">
+        <col style="width: 25%;">
+      </colgroup>
+      <thead>
+        <tr style="background: rgba(0,0,255,0.2);">
+          <th style="color: var(--tt-cyan); padding: 6px 4px; text-align: left; font-weight: normal;">COIN</th>
+          <th style="color: var(--tt-cyan); padding: 6px 4px; text-align: left; font-weight: normal;">NAME</th>
+          <th style="color: var(--tt-cyan); padding: 6px 4px; text-align: right; font-weight: normal;">PRICE</th>
+          <th style="color: var(--tt-cyan); padding: 6px 4px; text-align: right; font-weight: normal;">24H</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+  `;
 }
 
 /**
@@ -284,16 +316,8 @@ export function render() {
       
       <!-- Scrollable Content -->
       <div class="teletext-page-content">
-        <!-- Header Row -->
-        <div class="content-line header-row" style="display: flex; align-items: center; color: var(--tt-cyan); padding: 4px 0; gap: 8px; font-size: 0.9em; background: rgba(0,0,255,0.2);">
-          <span style="width: 40px;">COIN</span>
-          <span style="width: 90px;">NAME</span>
-          <span style="flex: 1; text-align: right;">PRICE (USD)</span>
-          <span style="width: 70px; text-align: right;">24H %</span>
-        </div>
-        
-        <!-- Crypto Rows (Req 7.2, 7.3, 7.4) -->
-        <div class="crypto-list" style="margin-top: 4px;">
+        <!-- Crypto Table (Req 7.2, 7.3, 7.4) - Header is inside the table -->
+        <div class="crypto-list">
           ${renderCryptoList(cryptoData.cryptos)}
         </div>
         
