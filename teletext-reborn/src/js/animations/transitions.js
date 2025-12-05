@@ -15,6 +15,7 @@
  */
 
 import gsap from 'gsap';
+import { playStatic } from '../services/soundManager.js';
 
 /**
  * Transition state management
@@ -157,6 +158,9 @@ export function createStaticFlashTimeline(options = {}) {
   const { staticOverlay } = options;
   
   const tl = gsap.timeline();
+  
+  // Play static sound effect during transition
+  playStatic();
   
   if (!staticOverlay) {
     // If no static overlay, just add a brief pause

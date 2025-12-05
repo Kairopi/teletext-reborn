@@ -420,3 +420,116 @@ body {
   text-decoration: underline;
 }
 
+
+
+/* ============================================
+   SETTINGS PAGE STYLES
+   ============================================ */
+
+/* Text input for settings */
+.teletext-input {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-small);
+  color: var(--tt-cyan);
+  background-color: var(--tt-black);
+  border: 2px solid var(--tt-cyan);
+  padding: 6px 8px;
+  outline: none;
+}
+
+.teletext-input:focus {
+  border-color: var(--tt-yellow);
+  box-shadow: 0 0 8px var(--tt-cyan);
+}
+
+.teletext-input::placeholder {
+  color: var(--color-secondary-40);
+}
+
+/* Radio buttons */
+.setting-radio {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.setting-radio input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--tt-cyan);
+  background: var(--tt-black);
+  cursor: pointer;
+}
+
+.setting-radio input[type="radio"]:checked {
+  background: var(--tt-cyan);
+  box-shadow: inset 0 0 0 2px var(--tt-black);
+}
+
+/* Checkboxes */
+.setting-toggle {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.setting-toggle input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--tt-cyan);
+  background: var(--tt-black);
+  cursor: pointer;
+  position: relative;
+}
+
+.setting-toggle input[type="checkbox"]:checked {
+  background: var(--tt-cyan);
+}
+
+.setting-toggle input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 1px;
+  color: var(--tt-black);
+  font-size: 10px;
+  font-weight: bold;
+}
+
+
+/* ============================================
+   THEME SUPPORT (Req 12.2)
+   Classic Green vs Full Color
+   ============================================ */
+
+/* Classic Green Theme - Green on black like original Teletext */
+.theme-classic {
+  --color-primary: var(--tt-green);
+}
+
+.theme-classic .teletext-page-title,
+.theme-classic .content-line:not([style*="color"]),
+.theme-classic .menu-item {
+  color: var(--tt-green);
+}
+
+.theme-classic .header-page-number {
+  color: var(--tt-green);
+}
+
+/* Full Color Theme (default) - Multi-color Teletext */
+.theme-color {
+  --color-primary: var(--tt-yellow);
+}
+
+/* Scanlines disabled state */
+.scanlines-disabled .scanlines {
+  display: none !important;
+  opacity: 0 !important;
+}

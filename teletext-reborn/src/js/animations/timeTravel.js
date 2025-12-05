@@ -15,6 +15,7 @@
 
 import gsap from 'gsap';
 import { TextPlugin } from 'gsap/TextPlugin';
+import { playTimeTravel } from '../services/soundManager.js';
 
 // Register GSAP plugins
 gsap.registerPlugin(TextPlugin);
@@ -147,6 +148,8 @@ export function createTimeTravelTimeline(options = {}) {
     onStart: () => {
       timeTravelState.isPlaying = true;
       timeTravelState.isComplete = false;
+      // Play time travel sound effect
+      playTimeTravel();
       if (onStart) onStart();
     },
     onComplete: () => {

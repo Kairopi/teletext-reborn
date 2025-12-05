@@ -12,6 +12,7 @@ import './styles/main.css'        // Layout and responsive styles
 // Import application modules
 import { getTeletextScreen } from './js/app.js';
 import { getRouter } from './js/router.js';
+import { initAudioOnInteraction } from './js/services/soundManager.js';
 
 /**
  * Initialize the Teletext Reborn application
@@ -23,6 +24,9 @@ function initApp() {
     console.error('App container not found');
     return;
   }
+  
+  // Initialize audio on first user interaction (browser autoplay policy)
+  initAudioOnInteraction();
   
   // Initialize the router and keyboard shortcuts
   const router = getRouter();

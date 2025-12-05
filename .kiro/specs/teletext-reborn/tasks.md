@@ -611,8 +611,45 @@ This implementation plan transforms the Teletext Reborn design into actionable c
     - Data limitation messages for pre-1940
     - _Requirements: 10.1-10.5_
 
-- [ ] 31. Implement Settings Page (src/js/pages/settings.js) - Page 900
-  - [ ] 31.1 Create settings page layout
+- [x] 30.4 **ENHANCED: Implement "Today in History" Experience (Pages 500-504)**
+
+  - [x] 30.4.1 Enhance Wikipedia API (src/js/services/wikipediaApi.js)
+    - Add `getEnhancedOnThisDay()` with increased limits (50 events, 25 births, 15 deaths)
+    - Add `getFeaturedEvents()`, `getHolidays()`, `getEventDetail()`
+    - Add `getDateStats()`, `searchEvents()`, `getEventsByCentury()`
+    - Parse full descriptions, Wikipedia URLs, page titles, thumbnails
+    - _Requirements: 35.1-35.8_
+
+  - [x] 30.4.2 Create Enhanced Time Machine (src/js/pages/timeMachineEnhanced.js)
+    - Simplified date selection (month/day only, no year)
+    - Default to TODAY's date
+    - Featured "Event of the Day" highlight
+    - Holiday banners
+    - Category tabs with counts and pagination (8 items/page)
+    - _Requirements: 34.1-34.7_
+
+  - [x] 30.4.3 Create Event Detail Page (Page 503)
+    - Full event description with word wrapping
+    - Year in double-height text
+    - Related Wikipedia article info
+    - Direct Wikipedia link
+    - Previous/Next navigation
+    - _Requirements: 34.7-34.8_
+
+  - [x] 30.4.4 Update app.js PAGE_REGISTRY
+    - Add pages 503 (Event Detail) and 504 (Timeline)
+    - Use enhanced Time Machine module
+    - _Requirements: 34.1-34.15_
+
+- [x] 31. Implement Settings Page (src/js/pages/settings.js) - Page 900
+
+
+
+
+
+
+  - [x] 31.1 Create settings page layout
+
     - Location input with Detect button
     - Birthday date picker
     - Temperature unit toggle
@@ -837,14 +874,20 @@ This implementation plan transforms the Teletext Reborn design into actionable c
 | 31 | Page Transitions | 10.1 |
 | 32 | Authentic Details | 44.1 |
 | 33 | Delightful Moments | 41.1 |
+| 34 | **Enhanced Time Machine** | **30.4.1-30.4.4** ✅ |
+| 35 | **Enhanced Wikipedia API** | **30.4.1** ✅ |
 
 ---
 
 ## Summary
 
-**Total Tasks:** 48 main tasks with 90+ sub-tasks
+**Total Tasks:** 48 main tasks with 95+ sub-tasks
 **Property-Based Tests:** 8 correctness properties
-**Requirements Coverage:** All 34 requirements (0-33) with 220+ acceptance criteria - 100% COVERED ✅
+**Requirements Coverage:** All 36 requirements (0-35) with 240+ acceptance criteria - 100% COVERED ✅
+
+**Enhanced Features Completed:**
+- ✅ Enhanced Time Machine "Today in History" (Req 34) - History.com-inspired experience
+- ✅ Enhanced Wikipedia API (Req 35) - 50 events, 25 births, 15 deaths, holidays support
 
 **Estimated Build Time:** 5 days
 - Day 1: Foundation + Core Infrastructure (Tasks 1-8)

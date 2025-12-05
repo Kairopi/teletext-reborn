@@ -13,6 +13,7 @@
 import gsap from 'gsap';
 import { getRouter, PAGE_NUMBERS } from './router.js';
 import { attachAllEffects } from './animations/effects.js';
+import { playClick } from './services/soundManager.js';
 
 // Import page components
 import * as homePage from './pages/home.js';
@@ -21,6 +22,8 @@ import * as weatherPage from './pages/weather.js';
 import * as financePage from './pages/finance.js';
 // Use enhanced Time Machine for better UX
 import * as timeMachinePage from './pages/timeMachineEnhanced.js';
+import * as settingsPage from './pages/settings.js';
+import * as aboutPage from './pages/about.js';
 
 /**
  * Page registry - maps page numbers to page modules
@@ -40,6 +43,9 @@ const PAGE_REGISTRY = {
   // Enhanced Time Machine pages
   503: timeMachinePage,  // Event Detail page
   504: timeMachinePage,  // Timeline view
+  // Settings and About
+  [PAGE_NUMBERS.SETTINGS]: settingsPage,
+  [PAGE_NUMBERS.ABOUT]: aboutPage,
 };
 
 /**
@@ -447,7 +453,10 @@ class TeletextScreen {
     const buttons = this._container.querySelectorAll('.fastext-button');
     
     buttons.forEach(button => {
-      button.addEventListener('click', (e) => {
+      button.addEventListener('click', () => {
+        // Play click sound for tactile feedback
+        playClick();
+        
         const pageNumber = parseInt(button.dataset.page, 10);
         
         if (!isNaN(pageNumber)) {
@@ -501,6 +510,7 @@ class TeletextScreen {
     
     if (prevButton) {
       prevButton.addEventListener('click', () => {
+        playClick();
         const router = getRouter();
         router.goToPreviousPage();
       });
@@ -508,6 +518,7 @@ class TeletextScreen {
     
     if (nextButton) {
       nextButton.addEventListener('click', () => {
+        playClick();
         const router = getRouter();
         router.goToNextPage();
       });
