@@ -41,40 +41,40 @@ body {
 
 .teletext-app {
   width: 100%;
-  max-width: 840px;
+  max-width: 760px;
   margin: 0 auto;
   flex-shrink: 0;
   flex-grow: 0;
 }
 
 /* ============================================
-   THE CRT SCREEN - FIXED 800x600 VIEWPORT
-   Compact but readable - NEVER resizes
+   THE CRT SCREEN - FIXED 720x540 VIEWPORT
+   Compact and fits well - NEVER resizes
    ============================================ */
 
 .teletext-screen {
   position: relative;
   
   /* FIXED DIMENSIONS - 4:3 aspect ratio, fits most screens */
-  width: 800px;
-  height: 600px;
+  width: 720px;
+  height: 540px;
   
   margin: 0 auto;
   background: var(--color-bg, #000000);
   
   /* Three-zone grid: Header | Content | Navigation */
   display: grid;
-  grid-template-rows: 42px 1fr 84px;
+  grid-template-rows: 38px 1fr 76px;
   grid-template-columns: 1fr;
   
   /* CRT glass curvature */
-  border-radius: 18px;
+  border-radius: 16px;
   
   /* Content stays inside */
   overflow: hidden;
   
-  /* BIGGER typography for readability */
-  font-size: 13px;
+  /* Good typography for readability */
+  font-size: 12px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
   
   /* Prevent resizing */
@@ -86,36 +86,36 @@ body {
 }
 
 /* ============================================
-   HEADER BAR - FIXED 42px
+   HEADER BAR - FIXED 38px
    ============================================ */
 
 .header-bar {
   background: var(--color-header-bg, #0000FF);
-  padding: 8px 20px;
+  padding: 6px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   
-  height: 42px;
+  height: 38px;
   flex-shrink: 0;
   overflow: hidden;
 }
 
 .header-service-name {
   color: var(--tt-white, #FFFFFF);
-  font-size: 13px;
+  font-size: 12px;
   letter-spacing: 1px;
 }
 
 .header-page-number {
   color: var(--tt-yellow, #FFFF00);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
 }
 
 .header-clock {
   color: var(--tt-white, #FFFFFF);
-  font-size: 13px;
+  font-size: 12px;
   min-width: 9ch;
 }
 
@@ -138,7 +138,7 @@ body {
 
 .content-area {
   background: var(--color-bg, #000000);
-  padding: 14px 20px;
+  padding: 12px 16px;
   position: relative;
   
   /* Scrollable when content overflows */
@@ -149,10 +149,10 @@ body {
   min-height: 0;
   height: 100%;
   
-  /* BIGGER Typography for readability */
-  font-size: 12px;
+  /* Good Typography for readability */
+  font-size: 11px;
   color: var(--color-primary, #FFFF00);
-  line-height: 1.7;
+  line-height: 1.6;
   
   /* Performance */
   contain: layout style;
@@ -190,11 +190,11 @@ body {
 .teletext-page-title {
   text-align: center;
   color: var(--tt-yellow);
-  font-size: 16px;
-  transform: scaleY(1.6);
+  font-size: 14px;
+  transform: scaleY(1.5);
   transform-origin: top;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -216,7 +216,7 @@ body {
 .content-grid {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   width: 100%;
 }
 
@@ -225,51 +225,51 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-height: 1.6em;
-  font-size: 12px;
+  min-height: 1.5em;
+  font-size: 11px;
 }
 
 /* Separator lines */
 .separator {
   color: var(--tt-cyan);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: -1px;
 }
 
 /* ============================================
-   NAVIGATION BAR - FIXED 84px
+   NAVIGATION BAR - FIXED 76px
    ============================================ */
 
 .navigation-bar {
   background: var(--color-bg, #000000);
-  padding: 8px 20px;
+  padding: 6px 16px;
   border-top: 2px solid var(--color-header-bg, #0000FF);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
   
-  height: 84px;
+  height: 76px;
   flex-shrink: 0;
 }
 
 /* Fastext buttons row */
 .fastext-bar {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
 }
 
 .fastext-button {
-  padding: 8px 18px;
+  padding: 7px 14px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: 11px;
+  font-size: 10px;
   border: none;
   cursor: pointer;
   transition: filter 0.15s ease-out, box-shadow 0.15s ease-out, transform 0.1s ease-out;
   position: relative;
   overflow: hidden;
-  min-width: 85px;
+  min-width: 75px;
   text-align: center;
 }
 
@@ -335,9 +335,9 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 16px;
+  padding: 5px 12px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: 11px;
+  font-size: 9px;
   color: var(--tt-cyan, #00FFFF);
   background: transparent;
   border: 2px solid var(--tt-cyan, #00FFFF);
@@ -356,10 +356,10 @@ body {
 }
 
 .page-input {
-  width: 6ch;
-  padding: 6px 10px;
+  width: 5ch;
+  padding: 5px 8px;
   font-family: var(--font-primary, 'Press Start 2P', monospace);
-  font-size: 12px;
+  font-size: 10px;
   color: var(--tt-yellow, #FFFF00);
   background: var(--tt-black, #000000);
   border: 2px solid var(--tt-cyan, #00FFFF);
