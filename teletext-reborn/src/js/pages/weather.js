@@ -333,12 +333,12 @@ function renderCurrentConditions(weather, location, unit) {
   
   // Build icon HTML - compact version
   const iconHTML = icon.map(line => 
-    `<div class="icon-line" style="color: var(--tt-yellow); font-family: monospace; white-space: pre; font-size: 0.85em; line-height: 1.1;">${line}</div>`
+    `<div class="icon-line" style="color: var(--tt-yellow); font-family: monospace; white-space: pre; font-size: 0.8em; line-height: 1.0;">${line}</div>`
   ).join('');
   
   return `
     <!-- Location Header (Req 6.6) -->
-    <div class="content-line location-header" style="color: var(--tt-cyan);">
+    <div class="content-line location-header" style="color: var(--tt-cyan); font-size: 1.05em;">
       📍 ${locationName}
     </div>
     
@@ -346,36 +346,51 @@ function renderCurrentConditions(weather, location, unit) {
       ${createSeparator('═', 40)}
     </div>
     
-    <!-- Current Conditions Section - Compact -->
-    <div class="current-weather" style="display: flex; gap: 12px; margin: 6px 0; align-items: flex-start;">
-      <!-- Weather Icon (Req 6.4) -->
-      <div class="weather-icon" style="flex: 0 0 auto;">
-        ${iconHTML}
-      </div>
-      
-      <!-- Temperature and Details -->
-      <div class="weather-details" style="flex: 1;">
-        <div class="temperature" style="color: var(--tt-yellow); font-size: 1.3em; line-height: 1.2;">
-          ${temp}
-        </div>
-        <div class="condition" style="color: var(--tt-white); margin-top: 2px;">
-          ${truncateToWidth(condition, 18)}
-        </div>
-        <div class="details" style="color: var(--color-secondary-70); margin-top: 4px; font-size: 0.9em;">
-          <div>HUMIDITY: ${humidity}</div>
-          <div>WIND: ${wind}</div>
-        </div>
-      </div>
-    </div>
+    <!-- Current Conditions Section using table for alignment -->
+    <table class="current-weather-table" style="width: 100%; table-layout: fixed; border-collapse: collapse; margin: 8px 0;">
+      <colgroup>
+        <col style="width: 35%;">
+        <col style="width: 65%;">
+      </colgroup>
+      <tr>
+        <td style="vertical-align: top; padding: 4px;">
+          <!-- Weather Icon (Req 6.4) -->
+          <div class="weather-icon">
+            ${iconHTML}
+          </div>
+        </td>
+        <td style="vertical-align: top; padding: 4px;">
+          <!-- Temperature -->
+          <div class="temperature" style="color: var(--tt-yellow); font-size: 1.4em; line-height: 1.2; margin-bottom: 4px;">
+            ${temp}
+          </div>
+          <!-- Condition -->
+          <div class="condition" style="color: var(--tt-white); margin-bottom: 6px;">
+            ${truncateToWidth(condition, 16)}
+          </div>
+          <!-- Details Table -->
+          <table style="width: 100%; table-layout: fixed; font-size: 0.9em;">
+            <tr>
+              <td style="color: var(--tt-cyan); padding: 2px 0;">HUMIDITY:</td>
+              <td style="color: var(--tt-white); padding: 2px 0;">${humidity}</td>
+            </tr>
+            <tr>
+              <td style="color: var(--tt-cyan); padding: 2px 0;">WIND:</td>
+              <td style="color: var(--tt-white); padding: 2px 0;">${wind}</td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   `;
 }
 
 /**
- * Render 5-day forecast
+ * Render 5-day forecast as a proper HTML table
  * Requirements: 6.3
  * @param {Array} forecast - Forecast data array
  * @param {string} unit - Temperature unit
- * @returns {string} HTML for forecast
+ * @returns {string} HTML for forecast table
  */
 function renderForecast(forecast, unit) {
   if (!forecast || forecast.length === 0) {
@@ -390,46 +405,54 @@ function renderForecast(forecast, unit) {
   const days = forecast.slice(0, 5);
   const symbol = unit === 'fahrenheit' ? '°F' : '°C';
   
-  const forecastHTML = days.map((day, index) => {
+  const forecastRows = days.map((day, index) => {
     const dayName = getDayName(day.date);
     const high = day.high !== null ? Math.round(day.high) : '--';
     const low = day.low !== null ? Math.round(day.low) : '--';
-    const condition = truncateToWidth(day.condition || '', 16);
+    const condition = truncateToWidth(day.condition || '', 14);
     const iconChar = getIconChar(day.icon);
     
-    // Compact format with better alignment
     return `
-      <div class="forecast-day" data-index="${index}" style="display: flex; align-items: center; padding: 3px 0; gap: 6px; border-bottom: 1px solid rgba(0,255,255,0.1);">
-        <span style="color: var(--tt-cyan); width: 36px; font-weight: bold;">${dayName}</span>
-        <span style="color: var(--tt-yellow); width: 18px; text-align: center;">${iconChar}</span>
-        <span style="color: var(--tt-red); width: 50px; text-align: right;">${high}${symbol}</span>
-        <span style="color: var(--tt-cyan); width: 50px; text-align: right;">${low}${symbol}</span>
-        <span style="color: var(--tt-white); flex: 1; text-align: left; padding-left: 8px;">${condition}</span>
-      </div>
+      <tr class="forecast-day" data-index="${index}">
+        <td style="color: var(--tt-cyan); padding: 5px 4px; font-weight: bold;">${dayName}</td>
+        <td style="color: var(--tt-yellow); padding: 5px 4px; text-align: center;">${iconChar}</td>
+        <td style="color: var(--tt-red); padding: 5px 4px; text-align: right;">${high}${symbol}</td>
+        <td style="color: var(--tt-cyan); padding: 5px 4px; text-align: right;">${low}${symbol}</td>
+        <td style="color: var(--tt-white); padding: 5px 4px;">${condition}</td>
+      </tr>
     `;
   }).join('');
   
   return `
-    <div class="content-line section-header" style="color: var(--tt-cyan); margin-top: 6px; font-weight: bold;">
+    <div class="content-line section-header" style="color: var(--tt-cyan); margin-top: 8px; font-weight: bold;">
       5-DAY FORECAST
     </div>
-    <div class="content-line separator" style="color: var(--tt-cyan); margin: 2px 0;">
+    <div class="content-line separator" style="color: var(--tt-cyan); margin: 4px 0;">
       ${createSeparator('─', 40)}
     </div>
     
-    <!-- Forecast Header -->
-    <div class="forecast-header" style="display: flex; align-items: center; color: var(--tt-cyan); padding: 3px 0; gap: 6px; font-size: 0.9em; background: rgba(0,0,255,0.15);">
-      <span style="width: 36px;">DAY</span>
-      <span style="width: 18px;"></span>
-      <span style="width: 50px; text-align: right;">HIGH</span>
-      <span style="width: 50px; text-align: right;">LOW</span>
-      <span style="flex: 1; padding-left: 8px;">CONDITION</span>
-    </div>
-    
-    <!-- Forecast Days -->
-    <div class="forecast-list">
-      ${forecastHTML}
-    </div>
+    <!-- Forecast Table with fixed column widths -->
+    <table class="forecast-table" style="width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.95em;">
+      <colgroup>
+        <col style="width: 15%;">
+        <col style="width: 10%;">
+        <col style="width: 20%;">
+        <col style="width: 20%;">
+        <col style="width: 35%;">
+      </colgroup>
+      <thead>
+        <tr style="background: rgba(0,0,255,0.2);">
+          <th style="color: var(--tt-cyan); padding: 5px 4px; text-align: left; font-weight: normal;">DAY</th>
+          <th style="color: var(--tt-cyan); padding: 5px 4px; text-align: center; font-weight: normal;"></th>
+          <th style="color: var(--tt-cyan); padding: 5px 4px; text-align: right; font-weight: normal;">HIGH</th>
+          <th style="color: var(--tt-cyan); padding: 5px 4px; text-align: right; font-weight: normal;">LOW</th>
+          <th style="color: var(--tt-cyan); padding: 5px 4px; text-align: left; font-weight: normal;">CONDITION</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${forecastRows}
+      </tbody>
+    </table>
   `;
 }
 
